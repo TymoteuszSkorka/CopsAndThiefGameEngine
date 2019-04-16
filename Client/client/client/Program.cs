@@ -23,6 +23,7 @@ namespace client
             IPEndPoint ep = new IPEndPoint(IPAddress.Parse(IpAddress), port);
             ClientSocket.Connect(ep);
             Console.WriteLine("Client is connected!");
+
             while (true)
             {
                 string messageFromClient = null;
@@ -30,7 +31,7 @@ namespace client
                 messageFromClient = Console.ReadLine();
                 ClientSocket.Send(System.Text.Encoding.ASCII.GetBytes(messageFromClient),
                     0, messageFromClient.Length, SocketFlags.None);
-                
+
                 byte[] MsgFromServer = new byte[1024];
                 int size = ClientSocket.Receive(MsgFromServer);
                 Console.WriteLine("Server answer: " + System.Text.Encoding.ASCII.GetString(MsgFromServer, 0, size));

@@ -12,12 +12,13 @@ using Newtonsoft.Json.Linq;
 
 namespace Server
 {
+    
     class Program
     {
+        static int counter = 0;
         static void Main(string[] args)
         {
             Board plansza = new Board(20, 20);
-
             int port = 13000;
             string IpAddress = "127.0.0.1";
             Socket ServerListener = new Socket(AddressFamily
@@ -28,41 +29,48 @@ namespace Server
             Console.WriteLine("Server is Listening ...");
             Socket ClientSocket = default(Socket);
 
-            int counter = 0;
             Program p = new Program();
             while (true)
             {
-                counter++;
                 ClientSocket = ServerListener.Accept();
+                Program.counter++;
                 Console.WriteLine(counter + " Clients connected");
-                Thread UserThread = new Thread(new ThreadStart(()=>p.User(ClientSocket, plansza)));
+                Thread UserThread = new Thread(new ThreadStart(() => p.User(ClientSocket, plansza)));
                 UserThread.Start();
             }
-        
+
         }
         public void User(Socket client, Board plansza)
         {
-            while (true)
+            while (client.Connected)
             {
-                byte[] msg = new byte[1024];
-                int size = client.Receive(msg);
-
-                string asciiString = Encoding.ASCII.GetString(msg, 0, msg.Length);
-                Console.WriteLine(asciiString);
-
-                if (msg.Length > 3)
+                
+                try
                 {
-                    string json = JsonConvert.SerializeObject(plansza);
+                    byte[] msg = new byte[1024];
+                    int size = client.Receive(msg);
+            
+                    string asciiString = Encoding.ASCII.GetString(msg, 0, msg.Length);
+                    Console.WriteLine(asciiString);
 
-                    byte[] msg1 = Encoding.ASCII.GetBytes(json);
-                    int size2 = msg1.Length;
+                    if (msg.Length > 3)
+                    {
+                        string json = JsonConvert.SerializeObject(plansza);
 
-                    client.Send(msg1, 0, size2, SocketFlags.None);
+                        byte[] msg1 = Encoding.ASCII.GetBytes(json);
+                        int size2 = msg1.Length;
+
+                        client.Send(msg1, 0, size2, SocketFlags.None);
+                    }
                 }
-                else
+                catch
                 {
-                    client.Send(msg, 0, size, SocketFlags.None);
+                    Program.counter--;
+                    client.Close();
+                    Console.WriteLine("Client disconnected");
+                    Console.WriteLine("Clients connected:" + counter);
                 }
+
             }
         }
     }
