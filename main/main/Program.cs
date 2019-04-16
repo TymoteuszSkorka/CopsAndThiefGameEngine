@@ -10,7 +10,17 @@ namespace main
     {
         static void Main(string[] args)
         {
-            Board myBoard = new Board(10, 10);
+            Board myBoard = new Board(22, 22);
+            myBoard.Init();
+            while(true)
+            {
+                myBoard.mapBoard();
+                myBoard.PrintBoard();
+                System.Threading.Thread.Sleep(500);
+                Console.Clear();
+                myBoard.simulate();
+            }
+            Console.Read();
         }
     }
 }
