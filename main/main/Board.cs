@@ -14,6 +14,7 @@ namespace main
         private List<Wall> m_listOfWalls;
         private List<Gate> m_listOfGates;
         private Thief m_Thief;
+        Random generator;
         private char[,] m_cBoardMap;
 
         public Board(short a_16NumOfRows, short a_16NumOfColumns)
@@ -24,6 +25,7 @@ namespace main
 
         public void Init(short a_16NumOfCops = 5, short a_16NumOfWalls = 4, short a_16NumOfGates = 2)
         {
+            generator = new Random();
             m_cBoardMap = new char[m_16NumOfRows, m_16NumOfColumns];
             m_listOfCops = new List<Cop>();
             m_listOfGates = new List<Gate>();
@@ -42,7 +44,7 @@ namespace main
             }
             for (int i = 0; i < a_16NumOfWalls; ++i)
             {
-                m_listOfWalls.Add(new Wall(ref m_cBoardMap));
+                m_listOfWalls.Add(new Wall(ref m_cBoardMap, ref generator, Convert.ToBoolean(generator.Next(0, 2))));
             }
             for (int i = 0; i < a_16NumOfGates; ++i)
             {
@@ -125,6 +127,14 @@ namespace main
                     Console.Write(" " + m_cBoardMap[i, j] + " ");
                 }
                 Console.WriteLine();
+            }
+        }
+
+        public void simulate()
+        {
+            for (int i = 0; i < m_listOfWalls.Count; ++i)
+            {
+                m_listOfWalls[i].Move();
             }
         }
     }

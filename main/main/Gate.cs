@@ -8,12 +8,14 @@ namespace main
 {
     class Gate
     {
+        public char[,] m_cBoard;
         public short[,] m_16GatePosition;
         private float m_fProbalityOfMovement;
         private float m_fProbalityOfChangingDirection;
 
         public Gate(ref char[,] a_cBoard, short a_16SizeofGate = 2, float a_fProbalityOfMovement = 0.5f, float a_fProbalityOfChangingDirection = 0.01f)
         {
+            m_cBoard = a_cBoard;
             m_16GatePosition = new short[a_16SizeofGate, 2];
             m_fProbalityOfMovement = a_fProbalityOfMovement;
             m_fProbalityOfChangingDirection = a_fProbalityOfChangingDirection;

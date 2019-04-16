@@ -12,8 +12,14 @@ namespace main
         {
             Board myBoard = new Board(22, 22);
             myBoard.Init();
-            myBoard.mapBoard();
-            myBoard.PrintBoard();
+            while(true)
+            {
+                myBoard.mapBoard();
+                myBoard.PrintBoard();
+                System.Threading.Thread.Sleep(500);
+                Console.Clear();
+                myBoard.simulate();
+            }
             Console.Read();
         }
     }
