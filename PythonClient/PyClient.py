@@ -1,5 +1,6 @@
 import socket
 import sys
+import json
 
 # Create a TCP/IP socket
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -22,6 +23,9 @@ while(True):
         amount_expected = len(message)
 
         while amount_received < amount_expected:
-            data = sock.recv(16)
+            data = sock.recv(200)
             amount_received += len(data)
             print('received "%s"' % data)
+            obj = json.loads(data)
+            for i in obj:
+                print(obj[i])

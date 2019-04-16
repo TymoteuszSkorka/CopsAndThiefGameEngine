@@ -6,12 +6,18 @@ using System.Threading.Tasks;
 using System.Net.Sockets;
 using System.Net;
 using System.Threading;
+using main;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+
 namespace Server
 {
     class Program
     {
         static void Main(string[] args)
         {
+            Board plansza = new Board(20, 20);
+
             int port = 13000;
             string IpAddress = "127.0.0.1";
             Socket ServerListener = new Socket(AddressFamily
@@ -29,30 +35,26 @@ namespace Server
                 counter++;
                 ClientSocket = ServerListener.Accept();
                 Console.WriteLine(counter + " Clients connected");
-                Thread UserThread = new Thread(new ThreadStart(()=>p.User(ClientSocket)));
+                Thread UserThread = new Thread(new ThreadStart(()=>p.User(ClientSocket, plansza)));
                 UserThread.Start();
             }
         
         }
-        public void User(Socket client)
+        public void User(Socket client, Board plansza)
         {
             while (true)
             {
                 byte[] msg = new byte[1024];
                 int size = client.Receive(msg);
-                string lol = "lol";
 
                 string asciiString = Encoding.ASCII.GetString(msg, 0, msg.Length);
                 Console.WriteLine(asciiString);
 
                 if (msg.Length > 3)
                 {
+                    string json = JsonConvert.SerializeObject(plansza);
 
-                    Console.WriteLine("weszlo");
-                    Map mapka = new Map();
-                    string s = mapka.Showmap();
-
-                    byte[] msg1 = Encoding.ASCII.GetBytes(s);
+                    byte[] msg1 = Encoding.ASCII.GetBytes(json);
                     int size2 = msg1.Length;
 
                     client.Send(msg1, 0, size2, SocketFlags.None);
