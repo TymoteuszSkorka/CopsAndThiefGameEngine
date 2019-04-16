@@ -10,7 +10,7 @@ namespace main
     {
         static void Main(string[] args)
         {
-            Board myBoard = new Board(10, 10);
+            Board myBoard = new Board(22, 22);
         }
     }
 }

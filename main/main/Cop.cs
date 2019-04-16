@@ -6,11 +6,21 @@ using System.Threading.Tasks;
 
 namespace main
 {
-    class Cop : Field
+    class Cop
     {
-        public override void Move()
+        public short[] m_16CopPosition { get => m_16CopPosition; private set => m_16CopPosition = value; }
+        
+        public Cop()
         {
-            throw new NotImplementedException();
+            m_16CopPosition = new short[2];
+            Random generator = new Random();
+            m_16CopPosition[0] = Convert.ToInt16(generator.Next(1, 22));
+            m_16CopPosition[1] = Convert.ToInt16(generator.Next(1, 22));
+        }
+
+        public void Move(short a_16Direction)
+        {
+
         }
     }
 }
