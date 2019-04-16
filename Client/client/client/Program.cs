@@ -8,12 +8,14 @@ using System.Net;
 using System.Threading;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Diagnostics;
 using main;
 
 namespace client
 {
     class Program
     {
+        static int time = 0;
         static void Main(string[] args)
         {
             int port = 13000;
@@ -24,22 +26,60 @@ namespace client
             ClientSocket.Connect(ep);
             Console.WriteLine("Client is connected!");
 
+            byte[] MsgFromServer_hello = new byte[1024];
+            int size_h = ClientSocket.Receive(MsgFromServer_hello);
+            Console.WriteLine("Server: " + System.Text.Encoding.ASCII.GetString(MsgFromServer_hello, 0, size_h));
+            string asciiString_h = Encoding.ASCII.GetString(MsgFromServer_hello, 0, MsgFromServer_hello.Length);
+
+
+            string messageFromClient_HS = null;
+            Console.Write("--->");
+            messageFromClient_HS = Console.ReadLine();
+            ClientSocket.Send(System.Text.Encoding.ASCII.GetBytes(messageFromClient_HS),
+                0, messageFromClient_HS.Length, SocketFlags.None);
+
+
+            byte[] MsgFromServer_state = new byte[1024];
+            int size_state = ClientSocket.Receive(MsgFromServer_state);
+            string asciiString_state = Encoding.ASCII.GetString(MsgFromServer_state, 0, MsgFromServer_state.Length);
+
+            while(string.Compare(asciiString_state,"failure, again:")==0)
+            {
+                Console.Write("--->");
+                messageFromClient_HS = Console.ReadLine();
+                ClientSocket.Send(System.Text.Encoding.ASCII.GetBytes(messageFromClient_HS),
+                    0, messageFromClient_HS.Length, SocketFlags.None);
+                size_state = ClientSocket.Receive(MsgFromServer_state);
+                asciiString_state = Encoding.ASCII.GetString(MsgFromServer_state, 0, MsgFromServer_state.Length);
+            }
+
+            Console.WriteLine(asciiString_state);
+       
             while (true)
             {
-                string messageFromClient = null;
-                Console.WriteLine("Ented the message");
-                messageFromClient = Console.ReadLine();
-                ClientSocket.Send(System.Text.Encoding.ASCII.GetBytes(messageFromClient),
-                    0, messageFromClient.Length, SocketFlags.None);
+                try
+                {
 
-                byte[] MsgFromServer = new byte[1024];
-                int size = ClientSocket.Receive(MsgFromServer);
-                Console.WriteLine("Server answer: " + System.Text.Encoding.ASCII.GetString(MsgFromServer, 0, size));
-                string asciiString = Encoding.ASCII.GetString(MsgFromServer, 0, MsgFromServer.Length);
-                Board plansza = JsonConvert.DeserializeObject<Board>(asciiString);
-                Console.WriteLine(plansza.m_16NumOfRows);
-                Console.WriteLine(plansza.m_16NumOfColumns);
+                    string messageFromClient = null;
+                    Console.WriteLine("Enter the message");
+                    messageFromClient = Console.ReadLine();
+                    ClientSocket.Send(System.Text.Encoding.ASCII.GetBytes(messageFromClient),
+                        0, messageFromClient.Length, SocketFlags.None);
 
+
+                    byte[] MsgFromServer = new byte[1024];
+                    int size = ClientSocket.Receive(MsgFromServer);
+                    Console.WriteLine("Server answer: " + System.Text.Encoding.ASCII.GetString(MsgFromServer, 0, size));
+                    string asciiString = Encoding.ASCII.GetString(MsgFromServer, 0, MsgFromServer.Length);
+                    Board plansza = JsonConvert.DeserializeObject<Board>(asciiString);
+                    Console.WriteLine(plansza.m_16NumOfRows);
+                    Console.WriteLine(plansza.m_16NumOfColumns);
+                }
+                catch
+                {
+                    Console.WriteLine("connection failure");
+                    ClientSocket.Close();
+                }
 
             }
         }
