@@ -11,6 +11,10 @@ namespace main
         static void Main(string[] args)
         {
             Board myBoard = new Board(22, 22);
+            myBoard.Init();
+            myBoard.mapBoard();
+            myBoard.PrintBoard();
+            Console.Read();
         }
     }
 }

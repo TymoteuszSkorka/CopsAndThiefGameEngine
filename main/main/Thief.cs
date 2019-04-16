@@ -8,15 +8,19 @@ namespace main
 {
     class Thief
     {
-        public short[] m_16ThiefPosition { get => m_16ThiefPosition; private set => m_16ThiefPosition = value; }
+        public short[] m_16ThiefPosition;
 
-        public Thief()
+        public Thief(ref char[,] a_cBoard)
         {
             m_16ThiefPosition = new short[2];
             Random generator = new Random();
-            m_16ThiefPosition[0] = Convert.ToInt16(generator.Next(1, 22));
-            m_16ThiefPosition[1] = Convert.ToInt16(generator.Next(1, 22));
-
+            do
+            {
+                m_16ThiefPosition[0] = Convert.ToInt16(generator.Next(1, 21));
+                m_16ThiefPosition[1] = Convert.ToInt16(generator.Next(1, 21));
+            }
+            while (a_cBoard[m_16ThiefPosition[0], m_16ThiefPosition[1]] != '0');
+            a_cBoard[m_16ThiefPosition[0], m_16ThiefPosition[1]] = 'T';
         }
 
         public void Move(short a_16Direction)
