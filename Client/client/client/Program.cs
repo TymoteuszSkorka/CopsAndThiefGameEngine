@@ -58,8 +58,16 @@ namespace client
                 }
 
                 Console.WriteLine(asciiString_state);
-                byte[] goMessage = new byte[1024];
-                ClientSocket.Receive(goMessage);
+
+                byte[] board_state = new byte[1024];
+                int board_state_Size = ClientSocket.Receive(board_state);
+
+                Console.WriteLine(System.Text.Encoding.ASCII.GetString(board_state, 0, board_state_Size));
+
+
+                string GO_messageFromClient_HS = Console.ReadLine();
+                ClientSocket.Send(System.Text.Encoding.ASCII.GetBytes(GO_messageFromClient_HS),
+                       0, GO_messageFromClient_HS.Length, SocketFlags.None);
 
                 //end of handshake ---------------------------------------------------------------------------------------------------------------------
                 while (true)

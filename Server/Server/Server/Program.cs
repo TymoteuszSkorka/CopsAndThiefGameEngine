@@ -18,6 +18,7 @@ namespace Server
         static int counter = 0;
         static bool Police = false;
         static bool Thief = false;
+        static int start = 0;
         static void Main(string[] args)
         {
             Board plansza = new Board(20, 20);
@@ -39,6 +40,7 @@ namespace Server
                 Console.WriteLine(counter + " Clients connected");
                 //Thread UserThread = new Thread(new ThreadStart(() => p.User(ClientSocket, plansza)));
 
+                //wiadomosc powitalna czeka na odpowiedź klienta czym chce grac :
                 string handShakeMsg = "Welcome to Cops&Thiefs game. Type 'T' for Thief or 'P' for Policeman: ";
                 ClientSocket.Send(System.Text.Encoding.ASCII.GetBytes(handShakeMsg),
                     0, handShakeMsg.Length, SocketFlags.None);
@@ -46,10 +48,11 @@ namespace Server
                 
                 try
                 {
+                    //odbiera wiadomośc klienta co wybrał
                     byte[] msg = new byte[1024];
                     int size = ClientSocket.Receive(msg);
                     string asciiString = Encoding.ASCII.GetString(msg, 0, msg.Length);
-
+                    //jeżeli źle to zatrzymuje się w pętli i oczekuje na poprawną odpowiedź
                     while ((string.Compare(asciiString, "T")!=0 || Program.Thief==true ) && (string.Compare(asciiString, "P") != 0) || Program.Police == true)
                     { 
                         string again = "already taken or input error, pick again:";
@@ -58,6 +61,7 @@ namespace Server
                         size = ClientSocket.Receive(msg);
                         asciiString = Encoding.ASCII.GetString(msg, 0, size);
                     }
+                    //przypisuje do ROLE literkę
                     string role;
                     if (string.Compare(asciiString, "T") == 0)
                     {
@@ -69,12 +73,25 @@ namespace Server
                         role = "Policeman";
                         Program.Police = true;
                     }
+                    //wiadomosć o powodzeniu wybrania postaci
                     string welcome = "welcome to the game Mr." +role+ "!!!";
                     ClientSocket.Send(System.Text.Encoding.ASCII.GetBytes(welcome),
                         0, welcome.Length, SocketFlags.None);
 
-                    //ClientSocket.ReceiveTimeout = 5000;
+                    //tutaj trzeba wylosować stan planszy jakoś
+                    //
+                    //
+                    //
+                    //
 
+                    //wysyłamy pierwszy wylosowany stan planszy
+                    string json = JsonConvert.SerializeObject(plansza);
+                    byte[] msg1 = Encoding.ASCII.GetBytes(json);
+                    int size2 = msg1.Length;
+                    ClientSocket.Send(msg1, 0, size2, SocketFlags.None);
+
+                    
+                    //towrzymy wątek z graczem
                     Thread UserThread = new Thread(new ThreadStart(() => p.User(ClientSocket, plansza)));
                     UserThread.Start();
                 }
@@ -87,6 +104,7 @@ namespace Server
                     Console.WriteLine("Clients connected:" + counter);
                     Program.Police = false;
                     Program.Thief = false;
+                    Program.start = 0;
                 }
                 
             }
@@ -105,9 +123,32 @@ namespace Server
                     Flaga = 1;
                 }
             }
+            //jezeli nie ma 2 graczy i oboje nie potwierdzili swojej gotowosci
+            try
+            {
+                while (start < 2 && counter > 1)
+                {
+                    byte[] msg = new byte[1024];
+                    int size = client.Receive(msg);
+                    start++;
+                }
+            }
+            catch
+            {
+                Program.counter--;
+                client.Close();
+                Console.WriteLine("Client disconnected");
+                Console.WriteLine("Clients connected:" + counter);
+                Program.Police = false;
+                Program.Thief = false;
+                Program.start = 0;
+            }
+            //jak oboje gotowi to startujemy, i ustawiamy licznik na wyslanie wiadomosci 
             client.ReceiveTimeout = 5000;
-            client.Send(System.Text.Encoding.ASCII.GetBytes("go"),
-                        0, "go".Length, SocketFlags.None);
+
+            //client.Send(System.Text.Encoding.ASCII.GetBytes("go"),
+            //            0, "go".Length, SocketFlags.None);
+
             while (client.Connected)
             {
                 
@@ -142,6 +183,7 @@ namespace Server
                         Console.WriteLine("Clients connected:" + counter);
                         Program.Police = false;
                         Program.Thief = false;
+                        Program.start = 0;
                     }
                     else if(sockEx.ErrorCode == 10060)
                     {
