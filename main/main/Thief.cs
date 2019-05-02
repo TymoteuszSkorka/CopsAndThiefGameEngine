@@ -10,9 +10,11 @@ namespace main
     {
         public short[] m_16ThiefPosition;
         public char[,] m_cBoard;
+        private Board m_board;
 
-        public Thief(ref char[,] a_cBoard)
+        public Thief(Board a_board, ref char[,] a_cBoard)
         {
+            m_board = a_board;
             m_cBoard = a_cBoard;
             m_16ThiefPosition = new short[2];
             Random generator = new Random();
@@ -55,6 +57,7 @@ namespace main
                     m_16ThiefPosition[1] = Convert.ToInt16(m_16ThiefPosition[1] - 1);
                 }
             }
+            m_board.mapBoard();
         }
     }
 }

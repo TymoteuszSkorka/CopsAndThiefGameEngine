@@ -14,10 +14,12 @@ namespace main
         private float m_fProbalityOfChangingDirection;
         private short m_16Direction;
         private bool m_bIsVertical;
+        private Board m_board;
         private Random generator;
 
-        public Wall(ref char[,] a_cBoard, ref Random a_generator, bool a_bIsVertical = true, short a_16SizeofWall = 4, float a_fProbalityOfMovement = 0.5f, float a_fProbalityOfChangingDirection = 0.01f)
+        public Wall(Board a_board,ref char[,] a_cBoard, ref Random a_generator, bool a_bIsVertical = true, short a_16SizeofWall = 4, float a_fProbalityOfMovement = 0.5f, float a_fProbalityOfChangingDirection = 0.01f)
         {
+            m_board = a_board;
             m_16Direction = 1;
             m_bIsVertical = a_bIsVertical;
             m_cBoard = a_cBoard;
@@ -46,8 +48,8 @@ namespace main
             {
                 do
                 {
-                    m_16WallPosition[0, 0] = Convert.ToInt16(generator.Next(1, 19));
-                    m_16WallPosition[0, 1] = Convert.ToInt16(generator.Next(1, 19));
+                    m_16WallPosition[0, 0] = Convert.ToInt16(generator.Next(1, 18));
+                    m_16WallPosition[0, 1] = Convert.ToInt16(generator.Next(1, 18));
                 }
                 while (a_cBoard[m_16WallPosition[0, 0], m_16WallPosition[0, 1]] != '0' && a_cBoard[m_16WallPosition[0, 0] + 1, m_16WallPosition[0, 1]] != '0' && a_cBoard[m_16WallPosition[0, 0] + 2, m_16WallPosition[0, 1]] != '0' && a_cBoard[m_16WallPosition[0, 0] + 3, m_16WallPosition[0, 1]] != '0');
                 a_cBoard[m_16WallPosition[0, 0], m_16WallPosition[0, 1]] = 'W';
@@ -64,23 +66,27 @@ namespace main
         { 
             float tmp = generator.Next(1, 101) / 100f;
             bool flag = false;
-            if (tmp <= m_fProbalityOfChangingDirection)
+            if (tmp <= m_fProbalityOfChangingDirection
+                || (m_bIsVertical && m_16Direction == 1 && m_16WallPosition[m_16WallPosition.GetLength(0) - 1, 1] == m_cBoard.GetLength(1) - 2)
+                || (m_bIsVertical && m_16Direction == -1 && m_16WallPosition[0, 1] == 1)
+                || (!m_bIsVertical && m_16Direction == -1 && m_16WallPosition[0, 0] == 1)
+                || (!m_bIsVertical && m_16Direction == 1 && m_16WallPosition[m_16WallPosition.GetLength(0) - 1, 0] == m_cBoard.GetLength(0) - 2))
             {
                 m_16Direction *= -1;
             }
-            if (m_bIsVertical && m_16Direction == 1 && m_16WallPosition[m_16WallPosition.GetLength(0) - 1, 1] < m_cBoard.GetLength(1) - 2 && m_cBoard[m_16WallPosition[m_16WallPosition.GetLength(0) - 1, 0], m_16WallPosition[m_16WallPosition.GetLength(0) - 1, 1] + 1] == '0')
+            if (m_bIsVertical && m_16Direction == 1 && m_16WallPosition[m_16WallPosition.GetLength(0) - 1, 1] < m_cBoard.GetLength(1) - 2 && (m_cBoard[m_16WallPosition[m_16WallPosition.GetLength(0) - 1, 0], m_16WallPosition[m_16WallPosition.GetLength(0) - 1, 1] + 1] == '0' || m_cBoard[m_16WallPosition[m_16WallPosition.GetLength(0) - 1, 0], m_16WallPosition[m_16WallPosition.GetLength(0) - 1, 1] + 1] == 'W'))
             {
                 flag = true;
             }
-            else if (m_bIsVertical && m_16Direction == -1 && m_16WallPosition[0, 1] > 1 && m_cBoard[m_16WallPosition[0, 0], m_16WallPosition[0, 1] - 1] == '0')
+            else if (m_bIsVertical && m_16Direction == -1 && m_16WallPosition[0, 1] > 1 && (m_cBoard[m_16WallPosition[0, 0], m_16WallPosition[0, 1] - 1] == '0' || m_cBoard[m_16WallPosition[0, 0], m_16WallPosition[0, 1] - 1] == 'W'))
             {
                 flag = true;
             }
-            else if (!m_bIsVertical && m_16Direction == -1 && m_16WallPosition[0, 0] > 1 && m_cBoard[m_16WallPosition[0, 0] - 1, m_16WallPosition[0, 1]] == '0')
+            else if (!m_bIsVertical && m_16Direction == -1 && m_16WallPosition[0, 0] > 1 && (m_cBoard[m_16WallPosition[0, 0] - 1, m_16WallPosition[0, 1]] == '0' || m_cBoard[m_16WallPosition[0, 0] - 1, m_16WallPosition[0, 1]] == 'W'))
             {
                 flag = true;
             }
-            else if (!m_bIsVertical && m_16Direction == 1 && m_16WallPosition[m_16WallPosition.GetLength(0) - 1, 0] < m_cBoard.GetLength(0) - 2 && m_cBoard[m_16WallPosition[m_16WallPosition.GetLength(0) - 1, 0] + 1, m_16WallPosition[m_16WallPosition.GetLength(0) - 1, 1]] == '0')
+            else if (!m_bIsVertical && m_16Direction == 1 && m_16WallPosition[m_16WallPosition.GetLength(0) - 1, 0] < m_cBoard.GetLength(0) - 2 && (m_cBoard[m_16WallPosition[m_16WallPosition.GetLength(0) - 1, 0] + 1, m_16WallPosition[m_16WallPosition.GetLength(0) - 1, 1]] == '0' || m_cBoard[m_16WallPosition[m_16WallPosition.GetLength(0) - 1, 0] + 1, m_16WallPosition[m_16WallPosition.GetLength(0) - 1, 1]] == 'W'))
             {
                 flag = true;
             }
@@ -92,6 +98,7 @@ namespace main
                     m_16WallPosition[i, Convert.ToInt32(m_bIsVertical)] += m_16Direction;
                 }
             }
+            m_board.mapBoard();
         }
     }
 }
