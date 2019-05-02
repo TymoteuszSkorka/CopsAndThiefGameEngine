@@ -132,6 +132,8 @@ namespace Server
                     int size = client.Receive(msg);
                     start++;
                 }
+            //jak oboje gotowi to startujemy, i ustawiamy licznik na wyslanie wiadomosci
+                client.ReceiveTimeout = 5000;
             }
             catch
             {
@@ -143,12 +145,8 @@ namespace Server
                 Program.Thief = false;
                 Program.start = 0;
             }
-            //jak oboje gotowi to startujemy, i ustawiamy licznik na wyslanie wiadomosci 
-            client.ReceiveTimeout = 5000;
-
-            //client.Send(System.Text.Encoding.ASCII.GetBytes("go"),
-            //            0, "go".Length, SocketFlags.None);
-
+             
+            
             while (client.Connected)
             {
                 
@@ -187,7 +185,7 @@ namespace Server
                     }
                     else if(sockEx.ErrorCode == 10060)
                     {
-                        //jeżeli serwer nie odpowie w ciągu okienka zmienia plansze na losowe pozycje
+                    //jeżeli serwer nie odpowie w ciągu okienka zmienia plansze na losowe pozycje
                         Console.WriteLine("default settings for board:");
                         plansza.m_16NumOfColumns += 1;
                         plansza.m_16NumOfRows += 1;
