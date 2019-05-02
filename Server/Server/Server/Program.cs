@@ -21,7 +21,9 @@ namespace Server
         static int start = 0;
         static void Main(string[] args)
         {
-            Board plansza = new Board(20, 20);
+            Board plansza = new Board(22, 22, 200);
+            plansza.Init();
+            plansza.mapBoard();
             int port = 13000;
             string IpAddress = "127.0.0.1";
             Socket ServerListener = new Socket(AddressFamily
@@ -160,8 +162,8 @@ namespace Server
                     string asciiString = Encoding.ASCII.GetString(msg, 0, msg.Length);
                     //Console.WriteLine(asciiString);
 
-                    plansza.m_16NumOfRows += 1;
-                    plansza.m_16NumOfColumns += 1;
+                    //plansza.m_16NumOfRows += 1;
+                    //plansza.m_16NumOfColumns += 1;
                     string json = JsonConvert.SerializeObject(plansza);
                     byte[] msg1 = Encoding.ASCII.GetBytes(json);
                     int size2 = msg1.Length;
@@ -187,8 +189,8 @@ namespace Server
                     {
                     //jeżeli serwer nie odpowie w ciągu okienka zmienia plansze na losowe pozycje
                         Console.WriteLine("default settings for board:");
-                        plansza.m_16NumOfColumns += 1;
-                        plansza.m_16NumOfRows += 1;
+                        //plansza.m_16NumOfColumns += 1;
+                        //plansza.m_16NumOfRows += 1;
 
                     }
                 }
