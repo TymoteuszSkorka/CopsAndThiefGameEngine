@@ -21,6 +21,9 @@ namespace Server
         static int start = 0;
         static bool disconnect_event = false;
         static bool error_flag = false;
+
+        static int licznik = 0;
+
         static void Main(string[] args)
         {
             InitialMap initBoard = new InitialMap();
@@ -98,7 +101,6 @@ namespace Server
                         //
                         //
                         //
-
                         //wysyłamy pierwszy wylosowany stan planszy
                         string json = JsonConvert.SerializeObject(settings);
                         byte[] msg1 = Encoding.ASCII.GetBytes(json);
@@ -187,6 +189,7 @@ namespace Server
                     Program.error_flag = false;
 
                     byte[] msg = new byte[1024];
+
                     int size = client.Receive(msg);
 
                     string asciiString = Encoding.ASCII.GetString(msg, 0, msg.Length);
@@ -197,6 +200,7 @@ namespace Server
                     int size2 = msg1.Length;
 
                     client.Send(msg1, 0, size2, SocketFlags.None);
+                    licznik++;
 
                 }
                 catch(System.Net.Sockets.SocketException sockEx)
@@ -217,7 +221,7 @@ namespace Server
                     }
                     else if(sockEx.ErrorCode == 10060)
                     {
-                        Console.WriteLine("default settings");
+                        Console.WriteLine("default settings, licznik : "+Program.licznik);
                         Program.error_flag = true;
                         goto while_func;
 

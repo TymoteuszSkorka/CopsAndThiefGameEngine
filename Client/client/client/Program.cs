@@ -17,7 +17,7 @@ namespace client
     {
         static int time = 0;
         static bool error_flag = false;
-        static string name = null;
+        static string name = null;       
         static void Main(string[] args)
         {
             try
