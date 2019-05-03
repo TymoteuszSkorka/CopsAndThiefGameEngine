@@ -19,7 +19,7 @@ namespace main
             {
                 myBoard.mapBoard();
                 myBoard.PrintBoard();
-                System.Threading.Thread.Sleep(100);
+                System.Threading.Thread.Sleep(200);
                 if (myBoard.m_bIfGameOver == false)
                     Console.Clear();
                 myBoard.simulate();

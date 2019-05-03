@@ -17,7 +17,7 @@ namespace main
         private Board m_board;
         private Random generator;
 
-        public Wall(Board a_board,ref char[,] a_cBoard, ref Random a_generator, bool a_bIsVertical = true, short a_16SizeofWall = 4, float a_fProbalityOfMovement = 0.5f, float a_fProbalityOfChangingDirection = 0.01f)
+        public Wall(Board a_board,ref char[,] a_cBoard, ref Random a_generator, bool a_bIsVertical = true, short a_16SizeofWall = 4, float a_fProbalityOfMovement = 0.75f, float a_fProbalityOfChangingDirection = 0.05f)
         {
             m_board = a_board;
             m_16Direction = 1;
