@@ -15,6 +15,7 @@ namespace main
         private short m_16NumOfColumns;
         public int m_32ThiefPayment;
         public int m_32CopsPayment;
+        private short kClock;
         private int m_32MaxNumberOfIterations;
         private int m_32CurrentIteration;
         private short m_16SizeOfWall;
@@ -39,10 +40,11 @@ namespace main
             boardPositions = a_positions;
         }
 
-        public void Init(short a_16NumOfCops = 5, short a_16NumOfWalls = 4, short a_16NumOfGates = 2, short a_16SizeOfWalls = 4, short a_16SizeOfGates = 2,
+        public void Init(short a_kClock = 5, short a_16NumOfCops = 5, short a_16NumOfWalls = 4, short a_16NumOfGates = 2, short a_16SizeOfWalls = 4, short a_16SizeOfGates = 2,
             float a_fProbabilityOfWallMove = 0.75f, float a_fProbabilityOfGateMove = 0.5f, float a_fProbabilityOfWallChangeDir = 0.05f,
             float a_fProbabilityOfGateChangeDir = 0.01f)
         {
+            kClock = a_kClock;
             m_16SizeOfWall = a_16SizeOfWalls;
             m_16SizeOfGate = a_16SizeOfGates;
             m_32ThiefPayment = 0;
@@ -51,6 +53,8 @@ namespace main
             m_bIfGameOver = false;
             generator = new Random();
             m_cBoardMap = new char[m_16NumOfRows, m_16NumOfColumns];
+            firstBoard.Init(a_16NumOfCops, a_16NumOfWalls, a_16NumOfGates, a_16SizeOfWalls, a_16SizeOfGates);
+            boardPositions.Init(kClock, a_16NumOfCops, a_16NumOfWalls, a_16NumOfGates, a_16SizeOfWalls, a_16SizeOfGates);
             m_listOfCops = new List<Cop>();
             m_listOfGates = new List<Gate>();
             m_listOfWalls = new List<Wall>();
@@ -62,7 +66,9 @@ namespace main
                 }
             }
             m_Thief = new Thief(this, ref m_cBoardMap);
-            for(int i = 0; i < a_16NumOfCops; ++i)
+            firstBoard.ThiefPos[0] = m_Thief.m_16ThiefPosition[0];
+            firstBoard.ThiefPos[0] = m_Thief.m_16ThiefPosition[1];
+            for (int i = 0; i < a_16NumOfCops; ++i)
             {
                 m_listOfCops.Add(new Cop(this, ref m_cBoardMap));
                 firstBoard.CopsPos[i, 0] = m_listOfCops[i].m_16CopPosition[0];
@@ -177,16 +183,30 @@ namespace main
                     for (int i = 0; i < m_listOfWalls.Count; ++i)
                     {
                         m_listOfWalls[i].Move();
+                        for (int j = 0; j < m_16SizeOfWall; ++j)
+                        {
+                            boardPositions.WallsPos[m_32CurrentIteration % kClock, i, j, 0] = m_listOfWalls[i].m_16WallPosition[j, 0];
+                            boardPositions.WallsPos[m_32CurrentIteration % kClock, i, j, 1] = m_listOfWalls[i].m_16WallPosition[j, 1];
+                        }
                     }
                     for (int i = 0; i < m_listOfGates.Count; ++i)
                     {
                         m_listOfGates[i].Move();
+                        for (int j = 0; j < m_16SizeOfGate; ++j)
+                        {
+                            boardPositions.GatesPos[m_32CurrentIteration % kClock, i, j, 0] = m_listOfGates[i].m_16GatePosition[j, 0];
+                            boardPositions.GatesPos[m_32CurrentIteration % kClock, i, j, 1] = m_listOfGates[i].m_16GatePosition[j, 1];
+                        }
                     }
                     for (int i = 0; i < m_listOfCops.Count; ++i)
                     {
                         m_listOfCops[i].Move(Convert.ToInt16(generator.Next(0, 5)));
+                        boardPositions.CopsPos[m_32CurrentIteration % kClock, i, 0] = m_listOfCops[i].m_16CopPosition[0];
+                        boardPositions.CopsPos[m_32CurrentIteration % kClock, i, 1] = m_listOfCops[i].m_16CopPosition[1];
                     }
                     m_Thief.Move(Convert.ToInt16(generator.Next(0, 5)));
+                    boardPositions.ThiefPos[m_32CurrentIteration % kClock, 0] = m_Thief.m_16ThiefPosition[0];
+                    boardPositions.ThiefPos[m_32CurrentIteration % kClock, 1] = m_Thief.m_16ThiefPosition[1];
                 }
                 for (int i = 0; i < m_listOfGates.Count; ++i)
                 {
