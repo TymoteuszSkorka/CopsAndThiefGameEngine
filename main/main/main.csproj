@@ -47,8 +47,11 @@
     <Compile Include="Board.cs" />
     <Compile Include="Cop.cs" />
     <Compile Include="Gate.cs" />
+    <Compile Include="InitialMap.cs" />
+    <Compile Include="Positions.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Settings.cs" />
     <Compile Include="Thief.cs" />
     <Compile Include="Wall.cs" />
   </ItemGroup>

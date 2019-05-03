@@ -10,7 +10,10 @@ namespace main
     {
         static void Main(string[] args)
         {
-            Board myBoard = new Board(22, 22, 200);
+            InitialMap initBoard = new InitialMap();
+            Positions boardPos = new Positions();
+            Settings settings = new Settings();
+            Board myBoard = new Board(22, 22, 200, ref settings, ref initBoard, ref boardPos);
             myBoard.Init();
             while(myBoard.m_bIfGameOver == false)
             {
