@@ -17,12 +17,14 @@ namespace main
         private Random generator;
         private Board m_board;
 
-        public Gate(Board a_board, ref char[,] a_cBoard, ref Random a_generator, short a_16SizeofGate = 2, float a_fProbalityOfMovement = 0.75f, float a_fProbalityOfChangingDirection = 0.25f)
+        public Gate(Board a_board, ref char[,] a_cBoard, ref Random a_generator, short a_16SizeofGate = 2, float a_fProbalityOfMovement = 0.5f, float a_fProbalityOfChangingDirection = 0.01f)
         {
             m_board = a_board;
             m_16Direction = new short[a_16SizeofGate];
-            m_16Direction[0] = 1;
-            m_16Direction[1] = 1;
+            for (int i = 0; i < a_16SizeofGate; ++i)
+            {
+                m_16Direction[i] = 1;
+            }
             m_cBoard = a_cBoard;
             m_bIsVertical = new bool[a_16SizeofGate];
             m_16GatePosition = new short[a_16SizeofGate, 2];
@@ -33,41 +35,55 @@ namespace main
             if (num == 0)
             {
                 m_16GatePosition[0, 0] = 0;
-                m_16GatePosition[0, 1] = Convert.ToInt16(generator.Next(1, 20));
-                m_16GatePosition[1, 0] = 0;
-                m_16GatePosition[1, 1] = Convert.ToInt16(m_16GatePosition[0, 1] + 1);
+                m_16GatePosition[0, 1] = Convert.ToInt16(generator.Next(1, a_cBoard.GetLength(1) - a_16SizeofGate));
                 m_bIsVertical[0] = true;
-                m_bIsVertical[1] = true;
+                for (int i = 1; i < a_16SizeofGate; ++i)
+                {
+                    m_16GatePosition[i, 0] = 0;
+                    m_16GatePosition[i, 1] = Convert.ToInt16(m_16GatePosition[i - 1, 1] + 1);
+                    m_bIsVertical[i] = true;
+                }
             }
             else if (num == 1)
             {
                 m_16GatePosition[0, 1] = Convert.ToInt16(a_cBoard.GetLength(1) - 1);
-                m_16GatePosition[0, 0] = Convert.ToInt16(generator.Next(1, 20));
-                m_16GatePosition[1, 1] = Convert.ToInt16(a_cBoard.GetLength(1) - 1);
-                m_16GatePosition[1, 0] = Convert.ToInt16(m_16GatePosition[0, 0] + 1);
+                m_16GatePosition[0, 0] = Convert.ToInt16(generator.Next(1, a_cBoard.GetLength(0) - a_16SizeofGate));
                 m_bIsVertical[0] = false;
-                m_bIsVertical[1] = false;
+                for (int i = 1; i < a_16SizeofGate; ++i)
+                {
+                    m_16GatePosition[i, 1] = Convert.ToInt16(a_cBoard.GetLength(1) - 1);
+                    m_16GatePosition[i, 0] = Convert.ToInt16(m_16GatePosition[i - 1, 0] + 1);
+                    m_bIsVertical[i] = false;
+                }
             }
             else if (num == 2)
             {
                 m_16GatePosition[0, 0] = Convert.ToInt16(a_cBoard.GetLength(0) - 1);
-                m_16GatePosition[0, 1] = Convert.ToInt16(generator.Next(1, 20));
-                m_16GatePosition[1, 0] = Convert.ToInt16(a_cBoard.GetLength(0) - 1);
-                m_16GatePosition[1, 1] = Convert.ToInt16(m_16GatePosition[0, 1] + 1);
+                m_16GatePosition[0, 1] = Convert.ToInt16(generator.Next(1, a_cBoard.GetLength(1) - a_16SizeofGate));
                 m_bIsVertical[0] = true;
-                m_bIsVertical[1] = true;
+                for (int i = 1; i < a_16SizeofGate; ++i)
+                {
+                    m_16GatePosition[i, 0] = Convert.ToInt16(a_cBoard.GetLength(0) - 1);
+                    m_16GatePosition[i, 1] = Convert.ToInt16(m_16GatePosition[i - 1, 1] + 1);
+                    m_bIsVertical[i] = true;
+                }
             }
             else if (num == 3)
             {
                 m_16GatePosition[0, 1] = 0;
-                m_16GatePosition[0, 0] = Convert.ToInt16(generator.Next(1, 20));
-                m_16GatePosition[1, 1] = 0;
-                m_16GatePosition[1, 0] = Convert.ToInt16(m_16GatePosition[0, 0] + 1);
+                m_16GatePosition[0, 0] = Convert.ToInt16(generator.Next(1, a_cBoard.GetLength(0) - a_16SizeofGate));
                 m_bIsVertical[0] = false;
-                m_bIsVertical[1] = false;
+                for (int i = 1; i < a_16SizeofGate; ++i)
+                {
+                    m_16GatePosition[i, 1] = 0;
+                    m_16GatePosition[i, 0] = Convert.ToInt16(m_16GatePosition[i - 1, 0] + 1);
+                    m_bIsVertical[i] = false;
+                }
             }
-            a_cBoard[m_16GatePosition[0, 0], m_16GatePosition[0, 1]] = 'G';
-            a_cBoard[m_16GatePosition[1, 0], m_16GatePosition[1, 1]] = 'G';
+            for (int i = 0; i < a_16SizeofGate; ++i)
+            {
+                a_cBoard[m_16GatePosition[i, 0], m_16GatePosition[i, 1]] = 'G';
+            }
         }
 
         public void Move()
