@@ -177,8 +177,7 @@ namespace Server
                         Program.error_flag = false;
                         byte[] err_msg_recive = new byte[1024];
                         int err_size_recive = client.Receive(err_msg_recive);
-                        //string err_asciiString = Encoding.ASCII.GetString(err_msg, 0, err_msg.Length);
-                        //Console.WriteLine(err_asciiString);
+
                         string err_json = JsonConvert.SerializeObject(plansza);
                         byte[] err_msg = Encoding.ASCII.GetBytes(err_json);
                         int err_size = err_msg.Length;
@@ -189,6 +188,7 @@ namespace Server
                     Program.error_flag = false;
 
                     byte[] msg = new byte[1024];
+
 
                     int size = client.Receive(msg);
 

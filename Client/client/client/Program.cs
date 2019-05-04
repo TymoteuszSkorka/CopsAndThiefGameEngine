@@ -92,13 +92,14 @@ namespace client
                         //
                         //
                         //
-                        System.Threading.Thread.Sleep(3000);
+                        
+                            System.Threading.Thread.Sleep(100);
 
                         string messageFromClient = null;
                         messageFromClient = name;
                         ClientSocket.Send(System.Text.Encoding.ASCII.GetBytes(messageFromClient),
                             0, messageFromClient.Length, SocketFlags.None);
-
+                        
                         byte[] MsgFromServer = new byte[1024];
                         int size = ClientSocket.Receive(MsgFromServer);
 
