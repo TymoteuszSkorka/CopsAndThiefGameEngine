@@ -76,7 +76,8 @@ namespace main
             }
             for (int i = 0; i < a_16NumOfWalls; ++i)
             {
-                m_listOfWalls.Add(new Wall(this, ref m_cBoardMap, ref generator, Convert.ToBoolean(generator.Next(0, 2))));
+                m_listOfWalls.Add(new Wall(this, ref m_cBoardMap, ref generator, Convert.ToBoolean(generator.Next(0, 2)),
+                    a_16NumOfWalls, a_fProbabilityOfWallMove,  a_fProbabilityOfWallChangeDir));
                 for (int j = 0; j < m_16SizeOfWall; ++j)
                 {
                     firstBoard.WallsPos[i, j, 0] = m_listOfWalls[i].m_16WallPosition[j, 0];
@@ -85,7 +86,7 @@ namespace main
             }
             for (int i = 0; i < a_16NumOfGates; ++i)
             {
-                m_listOfGates.Add(new Gate(this, ref m_cBoardMap, ref generator));
+                m_listOfGates.Add(new Gate(this, ref m_cBoardMap, ref generator, a_16SizeOfGates, a_fProbabilityOfGateMove, a_fProbabilityOfGateChangeDir));
                 for (int j = 0; j < m_16SizeOfGate; ++j)
                 {
                     firstBoard.GatesPos[i, j, 0] = m_listOfGates[i].m_16GatePosition[j, 0];
@@ -174,7 +175,7 @@ namespace main
             }
         }
 
-        public void simulate()
+        public void simulate(short[] a_CopsMove, short a_ThiefMove)
         {
             if (m_32CurrentIteration < m_32MaxNumberOfIterations)
             {
@@ -200,11 +201,11 @@ namespace main
                     }
                     for (int i = 0; i < m_listOfCops.Count; ++i)
                     {
-                        m_listOfCops[i].Move(Convert.ToInt16(generator.Next(0, 5)));
+                        m_listOfCops[i].Move(a_CopsMove[i]);
                         boardPositions.CopsPos[m_32CurrentIteration % kClock, i, 0] = m_listOfCops[i].m_16CopPosition[0];
                         boardPositions.CopsPos[m_32CurrentIteration % kClock, i, 1] = m_listOfCops[i].m_16CopPosition[1];
                     }
-                    m_Thief.Move(Convert.ToInt16(generator.Next(0, 5)));
+                    m_Thief.Move(a_ThiefMove);
                     boardPositions.ThiefPos[m_32CurrentIteration % kClock, 0] = m_Thief.m_16ThiefPosition[0];
                     boardPositions.ThiefPos[m_32CurrentIteration % kClock, 1] = m_Thief.m_16ThiefPosition[1];
                 }
