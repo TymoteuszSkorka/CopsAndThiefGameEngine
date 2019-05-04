@@ -190,7 +190,7 @@ namespace Server
                     byte[] msg = new byte[1024];
 
 
-                        int size = client.Receive(msg);
+                    int size = client.Receive(msg);
 
                     string asciiString = Encoding.ASCII.GetString(msg, 0, msg.Length);
                     Console.WriteLine(asciiString);
