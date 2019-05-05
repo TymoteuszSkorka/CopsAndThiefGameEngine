@@ -26,10 +26,11 @@ namespace Server
 
         static void Main(string[] args)
         {
+            int x = 0;
             InitialMap initBoard = new InitialMap();
             Positions boardPos = new Positions();
             Settings settings = new Settings();
-
+            Moves[] playersMoves = new Moves[2];
             Board plansza = new Board(22, 22, 200, ref settings, ref initBoard, ref boardPos);
 
             plansza.Init();
@@ -53,9 +54,8 @@ namespace Server
                     Program.counter++;
                     Console.WriteLine(counter + " Clients connected");
                     //towrzymy wątek z graczem
-                    Thread UserThread = new Thread(new ThreadStart(() => p.User(ClientSocket, plansza,settings,initBoard,boardPos)));
+                    Thread UserThread = new Thread(new ThreadStart(() => p.User(ClientSocket, ref plansza,ref settings,initBoard,boardPos, ref playersMoves, ref x)));
                     UserThread.Start();                   
-
                 }
 
             }
@@ -182,7 +182,7 @@ namespace Server
             }
         }
 
-        public void User(Socket client, Board plansza, Settings settings, InitialMap initBoard, Positions boardPos)
+        public void User(Socket client, ref Board plansza, ref Settings settings, InitialMap initBoard, Positions boardPos, ref Moves[] playersMove, ref int x)
         {
             handshake(client, plansza, settings);
             waiting_for_player(client, plansza, initBoard);
@@ -200,7 +200,7 @@ namespace Server
                         byte[] err_msg_recive = new byte[1024];
                         int err_size_recive = client.Receive(err_msg_recive);
 
-                        string err_json = JsonConvert.SerializeObject(plansza);
+                        string err_json = JsonConvert.SerializeObject(settings);
                         byte[] err_msg = Encoding.ASCII.GetBytes(err_json);
                         int err_size = err_msg.Length;
 
@@ -221,21 +221,22 @@ namespace Server
 
 
                     int size = client.Receive(msg);
-                    string asciiString = Encoding.ASCII.GetString(msg, 0, msg.Length);
-                    Console.WriteLine(asciiString);
+                    Moves tmp_move = JsonConvert.DeserializeObject<Moves>(Encoding.ASCII.GetString(msg, 0, msg.Length));
+                    if (tmp_move.m_sRole == "T")
+                    {
+                        playersMove[0] = tmp_move;
+                    }
+                    else if (tmp_move.m_sRole == "P")
+                    {
+                        playersMove[1] = tmp_move;
+                    }
 
-                    string json = JsonConvert.SerializeObject(plansza);
+                    string json = JsonConvert.SerializeObject(boardPos);
                     byte[] msg1 = Encoding.ASCII.GetBytes(json);
                     int size2 = msg1.Length;
 
                     client.Send(msg1, 0, size2, SocketFlags.None);
                     Program.iteration_num++;
-
-                    string json_moves = JsonConvert.SerializeObject(boardPos);
-                    byte[] msg1_moves = Encoding.ASCII.GetBytes(json_moves);
-                    int size2_moves = msg1_moves.Length;
-
-                    client.Send(msg1_moves, 0, size2_moves, SocketFlags.None);
 
                     while ((Program.iteration_num % 2) != 0)
                     {
@@ -243,6 +244,13 @@ namespace Server
                     }
                     Program.iteration_num = 0;
                     licznik++;
+                    x++;
+                    if (x == 1)
+                        plansza.simulate(playersMove[1].m_16Moves, playersMove[0].m_16Moves);
+                    else
+                    {
+                        x = 0;
+                    }
 
                 }
                 catch(System.Net.Sockets.SocketException sockEx)

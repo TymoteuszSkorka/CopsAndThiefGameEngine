@@ -17,7 +17,6 @@ while(True):
     else:
         print('sending "%s"' % message)
         sock.sendto(message.encode(), server_address)
-
         # Look for the response
         amount_received = 0
         amount_expected = len(message)

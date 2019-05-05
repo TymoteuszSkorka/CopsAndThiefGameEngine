@@ -76,7 +76,8 @@ namespace main
             }
             for (int i = 0; i < a_16NumOfWalls; ++i)
             {
-                m_listOfWalls.Add(new Wall(this, ref m_cBoardMap, ref generator, Convert.ToBoolean(generator.Next(0, 2))));
+                m_listOfWalls.Add(new Wall(this, ref m_cBoardMap, ref generator, Convert.ToBoolean(generator.Next(0, 2)),
+                    a_16NumOfWalls, a_fProbabilityOfWallMove,  a_fProbabilityOfWallChangeDir));
                 for (int j = 0; j < m_16SizeOfWall; ++j)
                 {
                     firstBoard.WallsPos[i, j, 0] = m_listOfWalls[i].m_16WallPosition[j, 0];
@@ -85,7 +86,7 @@ namespace main
             }
             for (int i = 0; i < a_16NumOfGates; ++i)
             {
-                m_listOfGates.Add(new Gate(this, ref m_cBoardMap, ref generator));
+                m_listOfGates.Add(new Gate(this, ref m_cBoardMap, ref generator, a_16SizeOfGates, a_fProbabilityOfGateMove, a_fProbabilityOfGateChangeDir));
                 for (int j = 0; j < m_16SizeOfGate; ++j)
                 {
                     firstBoard.GatesPos[i, j, 0] = m_listOfGates[i].m_16GatePosition[j, 0];
@@ -174,78 +175,85 @@ namespace main
             }
         }
 
-        public void simulate()
+        public void simulate(short[,] a_CopsMove, short[,] a_ThiefMove)
         {
-            if (m_32CurrentIteration < m_32MaxNumberOfIterations)
-            {
-                if (m_bIfGameOver == false)
+            for (int a = 0; a < kClock; ++a)
+            { 
+                if (m_32CurrentIteration < m_32MaxNumberOfIterations)
                 {
-                    for (int i = 0; i < m_listOfWalls.Count; ++i)
+                    if (m_bIfGameOver == false)
                     {
-                        m_listOfWalls[i].Move();
-                        for (int j = 0; j < m_16SizeOfWall; ++j)
+                        for (int i = 0; i < m_listOfWalls.Count; ++i)
                         {
-                            boardPositions.WallsPos[m_32CurrentIteration % kClock, i, j, 0] = m_listOfWalls[i].m_16WallPosition[j, 0];
-                            boardPositions.WallsPos[m_32CurrentIteration % kClock, i, j, 1] = m_listOfWalls[i].m_16WallPosition[j, 1];
+                            m_listOfWalls[i].Move();
+                            for (int j = 0; j < m_16SizeOfWall; ++j)
+                            {
+                                boardPositions.WallsPos[m_32CurrentIteration % kClock, i, j, 0] = m_listOfWalls[i].m_16WallPosition[j, 0];
+                                boardPositions.WallsPos[m_32CurrentIteration % kClock, i, j, 1] = m_listOfWalls[i].m_16WallPosition[j, 1];
+                            }
                         }
+                        for (int i = 0; i < m_listOfGates.Count; ++i)
+                        {
+                            m_listOfGates[i].Move();
+                            for (int j = 0; j < m_16SizeOfGate; ++j)
+                            {
+                                boardPositions.GatesPos[m_32CurrentIteration % kClock, i, j, 0] = m_listOfGates[i].m_16GatePosition[j, 0];
+                                boardPositions.GatesPos[m_32CurrentIteration % kClock, i, j, 1] = m_listOfGates[i].m_16GatePosition[j, 1];
+                            }
+                        }
+                        for (int i = 0; i < m_listOfCops.Count; ++i)
+                        {
+                            m_listOfCops[i].Move(a_CopsMove[a, i]);
+                            boardPositions.CopsPos[m_32CurrentIteration % kClock, i, 0] = m_listOfCops[i].m_16CopPosition[0];
+                            boardPositions.CopsPos[m_32CurrentIteration % kClock, i, 1] = m_listOfCops[i].m_16CopPosition[1];
+                        }
+                        m_Thief.Move(a_ThiefMove[a, 0]);
+                        boardPositions.ThiefPos[m_32CurrentIteration % kClock, 0] = m_Thief.m_16ThiefPosition[0];
+                        boardPositions.ThiefPos[m_32CurrentIteration % kClock, 1] = m_Thief.m_16ThiefPosition[1];
                     }
                     for (int i = 0; i < m_listOfGates.Count; ++i)
                     {
-                        m_listOfGates[i].Move();
-                        for (int j = 0; j < m_16SizeOfGate; ++j)
+                        for (int j = 0; j < m_listOfGates[i].m_16GatePosition.GetLength(0); ++j)
                         {
-                            boardPositions.GatesPos[m_32CurrentIteration % kClock, i, j, 0] = m_listOfGates[i].m_16GatePosition[j, 0];
-                            boardPositions.GatesPos[m_32CurrentIteration % kClock, i, j, 1] = m_listOfGates[i].m_16GatePosition[j, 1];
+                            if (m_Thief.m_16ThiefPosition[0] == m_listOfGates[i].m_16GatePosition[j, 0]
+                                && m_Thief.m_16ThiefPosition[1] == m_listOfGates[i].m_16GatePosition[j, 1])
+                            {
+                                m_bIfGameOver = true;
+                                m_32ThiefPayment = 2 * m_32MaxNumberOfIterations - m_32CurrentIteration - 1;
+                                m_32CopsPayment = -m_32ThiefPayment;
+                                winner = "Thief";
+                            }
                         }
                     }
                     for (int i = 0; i < m_listOfCops.Count; ++i)
                     {
-                        m_listOfCops[i].Move(Convert.ToInt16(generator.Next(0, 5)));
-                        boardPositions.CopsPos[m_32CurrentIteration % kClock, i, 0] = m_listOfCops[i].m_16CopPosition[0];
-                        boardPositions.CopsPos[m_32CurrentIteration % kClock, i, 1] = m_listOfCops[i].m_16CopPosition[1];
-                    }
-                    m_Thief.Move(Convert.ToInt16(generator.Next(0, 5)));
-                    boardPositions.ThiefPos[m_32CurrentIteration % kClock, 0] = m_Thief.m_16ThiefPosition[0];
-                    boardPositions.ThiefPos[m_32CurrentIteration % kClock, 1] = m_Thief.m_16ThiefPosition[1];
-                }
-                for (int i = 0; i < m_listOfGates.Count; ++i)
-                {
-                    for (int j = 0; j < m_listOfGates[i].m_16GatePosition.GetLength(0); ++j)
-                    {
-                        if (m_Thief.m_16ThiefPosition[0] == m_listOfGates[i].m_16GatePosition[j, 0]
-                            && m_Thief.m_16ThiefPosition[1] == m_listOfGates[i].m_16GatePosition[j, 1])
+                        if ((m_listOfCops[i].m_16CopPosition[0] + 1 == m_Thief.m_16ThiefPosition[0] && m_listOfCops[i].m_16CopPosition[1] == m_Thief.m_16ThiefPosition[1])
+                            || (m_listOfCops[i].m_16CopPosition[0] - 1 == m_Thief.m_16ThiefPosition[0] && m_listOfCops[i].m_16CopPosition[1] == m_Thief.m_16ThiefPosition[1])
+                            || (m_listOfCops[i].m_16CopPosition[1] + 1 == m_Thief.m_16ThiefPosition[1] && m_listOfCops[i].m_16CopPosition[0] == m_Thief.m_16ThiefPosition[0])
+                            || (m_listOfCops[i].m_16CopPosition[1] - 1 == m_Thief.m_16ThiefPosition[1] && m_listOfCops[i].m_16CopPosition[0] == m_Thief.m_16ThiefPosition[0])
+                            || (m_listOfCops[i].m_16CopPosition[1] == m_Thief.m_16ThiefPosition[1] && m_listOfCops[i].m_16CopPosition[0] == m_Thief.m_16ThiefPosition[0]))
                         {
                             m_bIfGameOver = true;
-                            m_32ThiefPayment = 2 * m_32MaxNumberOfIterations - m_32CurrentIteration - 1;
+                            winner = "COP";
+                            m_32ThiefPayment = m_32CurrentIteration;
                             m_32CopsPayment = -m_32ThiefPayment;
-                            winner = "Thief";
                         }
-                    }
-                }
-                for (int i = 0; i < m_listOfCops.Count; ++i)
-                {
-                    if ((m_listOfCops[i].m_16CopPosition[0] + 1 == m_Thief.m_16ThiefPosition[0] && m_listOfCops[i].m_16CopPosition[1] == m_Thief.m_16ThiefPosition[1])
-                        || (m_listOfCops[i].m_16CopPosition[0] - 1 == m_Thief.m_16ThiefPosition[0] && m_listOfCops[i].m_16CopPosition[1] == m_Thief.m_16ThiefPosition[1])
-                        || (m_listOfCops[i].m_16CopPosition[1] + 1 == m_Thief.m_16ThiefPosition[1] && m_listOfCops[i].m_16CopPosition[0] == m_Thief.m_16ThiefPosition[0])
-                        || (m_listOfCops[i].m_16CopPosition[1] - 1 == m_Thief.m_16ThiefPosition[1] && m_listOfCops[i].m_16CopPosition[0] == m_Thief.m_16ThiefPosition[0])
-                        || (m_listOfCops[i].m_16CopPosition[1] == m_Thief.m_16ThiefPosition[1] && m_listOfCops[i].m_16CopPosition[0] == m_Thief.m_16ThiefPosition[0]))
-                    {
-                        m_bIfGameOver = true;
-                        winner = "COP";
-                        m_32ThiefPayment = m_32CurrentIteration;
-                        m_32CopsPayment = -m_32ThiefPayment;
-                    }
 
+                    }
+                    mapBoard();
+                    Console.Clear();
+                    PrintBoard();
+                    System.Threading.Thread.Sleep(200);
+                    ++m_32CurrentIteration;
                 }
-                ++m_32CurrentIteration;
-            }
-            else
-            {
-                m_32ThiefPayment = m_32MaxNumberOfIterations;
-                m_32CopsPayment = -m_32ThiefPayment;
-                m_bIfGameOver = true;
-                winner = "Thief";
-            }
+                else
+                {
+                    m_32ThiefPayment = m_32MaxNumberOfIterations;
+                    m_32CopsPayment = -m_32ThiefPayment;
+                    m_bIfGameOver = true;
+                    winner = "Thief";
+                }
+        }
         }
     }
 }

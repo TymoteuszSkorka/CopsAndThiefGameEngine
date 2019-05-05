@@ -20,6 +20,11 @@ namespace client
         static string name = null;       
         static void Main(string[] args)
         {
+            Settings boardSettings;
+            Moves myMoves;
+            InitialMap initBoard;
+            Positions lastKMoves;
+            Random generator = new Random();
             try
             {
                 int port = 13000;
@@ -63,8 +68,23 @@ namespace client
                     //dostajemy od serwera ustawienia ogólne rozgrywki
                     byte[] board_state = new byte[1024];
                     int board_state_Size = ClientSocket.Receive(board_state);
-                    Console.WriteLine(System.Text.Encoding.ASCII.GetString(board_state, 0, board_state_Size));
+                    string json = System.Text.Encoding.ASCII.GetString(board_state, 0, board_state_Size);
+                    boardSettings = JsonConvert.DeserializeObject<Settings>(json);
 
+                    /*
+                     * TUTAJ MACIE CZAS NA INICJALIZACJE POMOCNICZYCH STRUKTUR NA PODSTAWIE USTAWIEN PLANSZY
+                     * Moves to klasa, do ktorej bedziecie wrzucać ruchy
+                     */
+                    myMoves = new Moves();
+                    if (name == "T")
+                    {
+                        myMoves.init(boardSettings.kClock, 1, name);
+                    }
+                    else if (name == "P")
+                    {
+                        myMoves.init(boardSettings.kClock, boardSettings.numOfCops, name);
+                    }
+                    
                     //wysyłamy wiadomosc ze chcemy zaczac
                     string GO_messageFromClient_HS = Console.ReadLine();
                     ClientSocket.Send(System.Text.Encoding.ASCII.GetBytes(GO_messageFromClient_HS),
@@ -73,7 +93,8 @@ namespace client
                     //oboje czekają na potwierdzenie od servera czy rozgrywka jest zaczęta, od servera dostajemy wylosowany stan planszy i ejst ustawiany w tym miejsu timer
                     byte[] rolled_board = new byte[1024];
                     int start_flag_size = ClientSocket.Receive(rolled_board);
-                    Console.WriteLine("Initial Board: " + System.Text.Encoding.ASCII.GetString(rolled_board, 0, start_flag_size));
+                    json = System.Text.Encoding.ASCII.GetString(rolled_board, 0, start_flag_size);
+                    initBoard = JsonConvert.DeserializeObject<InitialMap>(json);
 
                 }
 //end of handshake --------------------------------------------------------------------------------------------------------------------------
@@ -90,34 +111,34 @@ namespace client
                         //
                         //
                         //
-                        for (int i = 1;i< 1000000;i++) {
-                            if (i % 2 == 1)
+                        for (int a = 0; a < boardSettings.kClock; ++a)
+                        {
+                            if (name == "T")
                             {
-                                System.Threading.Thread.Sleep(2000);
+                                myMoves.m_16Moves[a, 0] = Convert.ToInt16(generator.Next(0, 5));
                             }
-                            else
+                            else if (name == "P")
                             {
-                                System.Threading.Thread.Sleep(3500);
+                                for (int b = 0; b < boardSettings.numOfCops; ++b)
+                                {
+                                    myMoves.m_16Moves[a, b] = Convert.ToInt16(generator.Next(0, 5));
+                                }
                             }
+                        }
 
-                                string messageFromClient = null;
-                                messageFromClient = name;
-                                ClientSocket.Send(System.Text.Encoding.ASCII.GetBytes(messageFromClient),
-                                    0, messageFromClient.Length, SocketFlags.None);
+                        string messageFromClient = null;
+                        messageFromClient = JsonConvert.SerializeObject(myMoves);
+                        ClientSocket.Send(System.Text.Encoding.ASCII.GetBytes(messageFromClient),
+                            0, messageFromClient.Length, SocketFlags.None);
+                        myMoves.resetMoves();
+                        byte[] MsgFromServer = new byte[1024];
+                        int size = ClientSocket.Receive(MsgFromServer);
 
-                                byte[] MsgFromServer = new byte[1024];
-                                int size = ClientSocket.Receive(MsgFromServer);
-
-                                Console.WriteLine("Server answer: " + System.Text.Encoding.ASCII.GetString(MsgFromServer, 0, size));
-                                string asciiString = Encoding.ASCII.GetString(MsgFromServer, 0, MsgFromServer.Length);
-                                //Board plansza = JsonConvert.DeserializeObject<Board>(asciiString);
-
-                                byte[] MsgFromServer_moves = new byte[1024];
-                                int size_moves = ClientSocket.Receive(MsgFromServer_moves);
-                                Console.WriteLine("Last five moves: " + System.Text.Encoding.ASCII.GetString(MsgFromServer, 0, size));
-                                string asciiString_moves = Encoding.ASCII.GetString(MsgFromServer_moves, 0, MsgFromServer_moves.Length);
-                                //Board plansza = JsonConvert.DeserializeObject<Board>(asciiString);
-                            }
+                        byte[] MsgFromServer_moves = new byte[1024];
+                        int size_moves = ClientSocket.Receive(MsgFromServer_moves);
+                        lastKMoves = JsonConvert.DeserializeObject<Positions>(System.Text.Encoding.ASCII.GetString(MsgFromServer, 0, size));
+                        string asciiString_moves = Encoding.ASCII.GetString(MsgFromServer_moves, 0, MsgFromServer_moves.Length);
+                        //Board plansza = JsonConvert.DeserializeObject<Board>(asciiString);
 
                     }
                     catch
