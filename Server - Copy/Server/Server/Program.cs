@@ -46,17 +46,23 @@ namespace Server
             Socket ClientSocket = default(Socket);
 
             Program p = new Program();
-            
-                while (true&&counter<2)
+            try
+            {
+                while (true && counter < 2)
                 {
                     ClientSocket = ServerListener.Accept();
                     Program.counter++;
                     Console.WriteLine(counter + " Clients connected");
                     //towrzymy wątek z graczem
-                    Thread UserThread = new Thread(new ThreadStart(() => p.User(ClientSocket, plansza,settings,initBoard,boardPos)));
-                    UserThread.Start();                   
+                    Thread UserThread = new Thread(new ThreadStart(() => p.User(ClientSocket, plansza, settings, initBoard, boardPos)));
+                    UserThread.Start();
 
                 }
+            }
+            catch
+            {
+
+            }
 
             }
 
@@ -115,13 +121,17 @@ namespace Server
             catch (System.Net.Sockets.SocketException sockEx)
             {
                 //Console.WriteLine(sockEx.ErrorCode);
-                Program.counter--;
+                Program.counter--;               
+                client.Shutdown(SocketShutdown.Both);
                 client.Close();
+                bool lol = client.Connected;
                 Console.WriteLine("Client disconnected");
                 Console.WriteLine("Clients connected:" + counter);
                 Program.Police = false;
                 Program.Thief = false;
                 Program.start = 0;
+               
+                
             }
 
         }
@@ -132,6 +142,7 @@ namespace Server
             {
                 int Flaga = 0;
                 byte[] tmp_msg = new byte[1024];
+                if(client.Connected)
                 client.Receive(tmp_msg);//wiadomosc potwierdzajaca gotowosc
                 //czekanie na przeciwnika
                 while (Program.Thief == false || Program.Police == false)
@@ -150,8 +161,6 @@ namespace Server
                     }
 
                 }
-
-
 
                 Program.start++;
                 while (start < 2)
@@ -173,22 +182,34 @@ namespace Server
             catch
             {
                 Program.counter--;
+                client.Shutdown(SocketShutdown.Both);
+                client.Dispose();
                 client.Close();
+                //client.Dispose();
+
                 Console.WriteLine("Client disconnected");
+                if (counter < 0)
+                {
+                    counter = 0;
+                }
                 Console.WriteLine("Clients connected:" + counter);
                 Program.Police = false;
                 Program.Thief = false;
                 Program.start = 0;
+                
             }
         }
 
         public void User(Socket client, Board plansza, Settings settings, InitialMap initBoard, Positions boardPos)
         {
             handshake(client, plansza, settings);
-            waiting_for_player(client, plansza, initBoard);
+            if (client.Connected)
+            {
+                waiting_for_player(client, plansza, initBoard);
+            }
 
         while_func:
-            while (true)        
+            while (client.Connected)        
             {
                 bool error_flag = false;
                 try
@@ -215,14 +236,14 @@ namespace Server
 
                         //goto while_func;
                     }
-                    //client.ReceiveTimeout = 3000;
 
                     byte[] msg = new byte[1024];
 
-
                     int size = client.Receive(msg);
+                    
                     string asciiString = Encoding.ASCII.GetString(msg, 0, msg.Length);
                     Console.WriteLine(asciiString);
+                    
 
                     string json = JsonConvert.SerializeObject(plansza);
                     byte[] msg1 = Encoding.ASCII.GetBytes(json);
@@ -245,20 +266,27 @@ namespace Server
                     licznik++;
 
                 }
+                
                 catch(System.Net.Sockets.SocketException sockEx)
                 {
                     
                     //Console.WriteLine(sockEx.ErrorCode);
                     if (sockEx.ErrorCode != 10060)
                     {
-                        Program.counter--;
+                        client.Shutdown(SocketShutdown.Both);
                         client.Close();
+                        Program.counter--;
                         Console.WriteLine("Client disconnected");
+                        if (counter < 0)
+                        {
+                            counter = 0;
+                        }
                         Console.WriteLine("Clients connected:" + counter);
                         Program.Police = false;
                         Program.Thief = false;
                         Program.start = 0;
                     }
+                    
                     else if(sockEx.ErrorCode == 10060)
                     {
                         Program.iteration_num++;
@@ -268,6 +296,7 @@ namespace Server
                         goto while_func;
 
                     }
+
                 }
 
             }

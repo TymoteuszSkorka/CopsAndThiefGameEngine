@@ -24,6 +24,7 @@ namespace client
             {
                 int port = 13000;
                 string IpAddress = "127.0.0.1";
+                //string IpAddress = "192.168.0.234";
                 Socket ClientSocket = new Socket(AddressFamily
                     .InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 IPEndPoint ep = new IPEndPoint(IPAddress.Parse(IpAddress), port);
@@ -93,11 +94,11 @@ namespace client
                         for (int i = 1;i< 1000000;i++) {
                             if (i % 2 == 1)
                             {
-                                System.Threading.Thread.Sleep(2000);
+                                System.Threading.Thread.Sleep(3500);
                             }
                             else
                             {
-                                System.Threading.Thread.Sleep(3500);
+                                System.Threading.Thread.Sleep(1000);
                             }
 
                                 string messageFromClient = null;
