@@ -47,8 +47,7 @@ namespace Server
             Socket ClientSocket = default(Socket);
 
             Program p = new Program();
-            try
-            {
+
                 while (true && counter < 2)
                 {
                     ClientSocket = ServerListener.Accept();
@@ -58,12 +57,7 @@ namespace Server
                     Thread UserThread = new Thread(new ThreadStart(() => p.User(ClientSocket, ref plansza,ref settings,initBoard,boardPos, ref playersMoves, ref x)));
                     UserThread.Start();                   
                 }
-            }
-            catch
-            {
-
-            }
-
+     
             }
 
         public void handshake(Socket client, Board plansza, Settings settings)
@@ -124,18 +118,18 @@ namespace Server
                 Program.counter--;               
                 client.Shutdown(SocketShutdown.Both);
                 client.Close();
-                bool lol = client.Connected;
+                if (counter < 0)
+                {
+                    counter = 0;
+                }
                 Console.WriteLine("Client disconnected");
                 Console.WriteLine("Clients connected:" + counter);
                 Program.Police = false;
                 Program.Thief = false;
-                Program.start = 0;
-               
-                
+                Program.start = 0;               
             }
 
         }
-
         public void waiting_for_player(Socket client, Board plansza, InitialMap initBoard)
         {
             try
@@ -183,10 +177,7 @@ namespace Server
             {
                 Program.counter--;
                 client.Shutdown(SocketShutdown.Both);
-                client.Dispose();
                 client.Close();
-                //client.Dispose();
-
                 Console.WriteLine("Client disconnected");
                 if (counter < 0)
                 {
@@ -240,15 +231,23 @@ namespace Server
                     byte[] msg = new byte[1024];
 
                     int size = client.Receive(msg);
-                    Moves tmp_move = JsonConvert.DeserializeObject<Moves>(Encoding.ASCII.GetString(msg, 0, msg.Length));
-                    if (tmp_move.m_sRole == "T")
+                    try
                     {
-                        playersMove[0] = tmp_move;
+                        Moves tmp_move = JsonConvert.DeserializeObject<Moves>(System.Text.Encoding.ASCII.GetString(msg, 0, msg.Length));
+                        if (tmp_move.m_sRole == "T")
+                        {
+                            playersMove[0] = tmp_move;
+                        }
+                        else if (tmp_move.m_sRole == "P")
+                        {
+                            playersMove[1] = tmp_move;
+                        }
                     }
-                    else if (tmp_move.m_sRole == "P")
+                    catch
                     {
-                        playersMove[1] = tmp_move;
+
                     }
+                    
                     string json = JsonConvert.SerializeObject(boardPos);
                     byte[] msg1 = Encoding.ASCII.GetBytes(json);
                     int size2 = msg1.Length;

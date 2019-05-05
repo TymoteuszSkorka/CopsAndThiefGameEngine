@@ -85,8 +85,9 @@ namespace client
                     {
                         myMoves.init(boardSettings.kClock, boardSettings.numOfCops, name);
                     }
-                    
+
                     //wysyłamy wiadomosc ze chcemy zaczac
+                    Console.Write("Type whateve if u'r ready");
                     string GO_messageFromClient_HS = Console.ReadLine();
                     ClientSocket.Send(System.Text.Encoding.ASCII.GetBytes(GO_messageFromClient_HS),
                            0, GO_messageFromClient_HS.Length, SocketFlags.None);
@@ -132,13 +133,13 @@ namespace client
                         ClientSocket.Send(System.Text.Encoding.ASCII.GetBytes(messageFromClient),
                             0, messageFromClient.Length, SocketFlags.None);
                         myMoves.resetMoves();
-                        byte[] MsgFromServer = new byte[1024];
-                        int size = ClientSocket.Receive(MsgFromServer);
+                        //byte[] MsgFromServer = new byte[1024];
+                        //int size = ClientSocket.Receive(MsgFromServer);
 
                         byte[] MsgFromServer_moves = new byte[1024];
                         int size_moves = ClientSocket.Receive(MsgFromServer_moves);
-                        lastKMoves = JsonConvert.DeserializeObject<Positions>(System.Text.Encoding.ASCII.GetString(MsgFromServer, 0, size));
-                        string asciiString_moves = Encoding.ASCII.GetString(MsgFromServer_moves, 0, MsgFromServer_moves.Length);
+                        //lastKMoves = JsonConvert.DeserializeObject<Positions>(System.Text.Encoding.ASCII.GetString(MsgFromServer_moves, 0, size_moves));
+                        //string asciiString_moves = Encoding.ASCII.GetString(MsgFromServer_moves, 0, MsgFromServer_moves.Length);
                         //Board plansza = JsonConvert.DeserializeObject<Board>(asciiString);
 
                     }
