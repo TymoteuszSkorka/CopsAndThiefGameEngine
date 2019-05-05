@@ -20,7 +20,7 @@ namespace Server
         static bool Thief = false;
         static int start = 0;
         static bool disconnect_event = false;
-        static bool error_flag = false;
+        
 
         static int licznik = 0;
 
@@ -189,13 +189,14 @@ namespace Server
 
         while_func:
             while (true)        
-            {               
+            {
+                bool error_flag = false;
                 try
                 {
                     if (error_flag == true)
                     {
                         //jeżeli nie zmieścił się w ruchach 
-                        Program.error_flag = false;
+                        error_flag = false;
                         byte[] err_msg_recive = new byte[1024];
                         int err_size_recive = client.Receive(err_msg_recive);
 
@@ -215,7 +216,6 @@ namespace Server
                         //goto while_func;
                     }
                     //client.ReceiveTimeout = 3000;
-                    Program.error_flag = false;
 
                     byte[] msg = new byte[1024];
 
@@ -258,7 +258,7 @@ namespace Server
                     else if(sockEx.ErrorCode == 10060)
                     {
                         Console.WriteLine("default settings, licznik : "+Program.licznik);
-                        Program.error_flag = true;
+                        error_flag = true;
                         goto while_func;
 
                     }
