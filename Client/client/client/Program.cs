@@ -29,6 +29,7 @@ namespace client
             {
                 int port = 13000;
                 string IpAddress = "127.0.0.1";
+                //string IpAddress = "192.168.0.234";
                 Socket ClientSocket = new Socket(AddressFamily
                     .InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 IPEndPoint ep = new IPEndPoint(IPAddress.Parse(IpAddress), port);
