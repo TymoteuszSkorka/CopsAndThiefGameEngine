@@ -36,7 +36,6 @@ namespace client
                     Console.WriteLine("Server: " + System.Text.Encoding.ASCII.GetString(MsgFromServer_hello, 0, size_h));
                     string asciiString_h = Encoding.ASCII.GetString(MsgFromServer_hello, 0, MsgFromServer_hello.Length);
 
-
                     string messageFromClient_HS = null;
                     Console.Write(">");
                     messageFromClient_HS = Console.ReadLine();
@@ -61,8 +60,7 @@ namespace client
                     name = messageFromClient_HS;
                     Console.WriteLine(asciiString_state);
 
-
-                    //dostajemy od serwera plansze
+                    //dostajemy od serwera ustawienia ogólne rozgrywki
                     byte[] board_state = new byte[1024];
                     int board_state_Size = ClientSocket.Receive(board_state);
                     Console.WriteLine(System.Text.Encoding.ASCII.GetString(board_state, 0, board_state_Size));
@@ -72,10 +70,10 @@ namespace client
                     ClientSocket.Send(System.Text.Encoding.ASCII.GetBytes(GO_messageFromClient_HS),
                            0, GO_messageFromClient_HS.Length, SocketFlags.None);
 
-                    //oboje czekają na potwierdzenie od servera czy rozgrywka jest zaczęta
-                    byte[] start_flag = new byte[1024];
-                    int start_flag_size = ClientSocket.Receive(board_state);
-                    string flag_string = Encoding.ASCII.GetString(start_flag, 0, start_flag_size);
+                    //oboje czekają na potwierdzenie od servera czy rozgrywka jest zaczęta, od servera dostajemy wylosowany stan planszy i ejst ustawiany w tym miejsu timer
+                    byte[] rolled_board = new byte[1024];
+                    int start_flag_size = ClientSocket.Receive(rolled_board);
+                    Console.WriteLine("Initial Board: " + System.Text.Encoding.ASCII.GetString(rolled_board, 0, start_flag_size));
 
                 }
 //end of handshake --------------------------------------------------------------------------------------------------------------------------
@@ -92,21 +90,35 @@ namespace client
                         //
                         //
                         //
-                        
-                            System.Threading.Thread.Sleep(100);
+                        for (int i = 1;i< 1000000;i++) {
+                            if (i % 2 == 1)
+                            {
+                                System.Threading.Thread.Sleep(2000);
+                            }
+                            else
+                            {
+                                System.Threading.Thread.Sleep(3500);
+                            }
 
-                        string messageFromClient = null;
-                        messageFromClient = name;
-                        ClientSocket.Send(System.Text.Encoding.ASCII.GetBytes(messageFromClient),
-                            0, messageFromClient.Length, SocketFlags.None);
-                        
-                        byte[] MsgFromServer = new byte[1024];
-                        int size = ClientSocket.Receive(MsgFromServer);
+                                string messageFromClient = null;
+                                messageFromClient = name;
+                                ClientSocket.Send(System.Text.Encoding.ASCII.GetBytes(messageFromClient),
+                                    0, messageFromClient.Length, SocketFlags.None);
 
-                        Console.WriteLine("Server answer: " + System.Text.Encoding.ASCII.GetString(MsgFromServer, 0, size));
-                        string asciiString = Encoding.ASCII.GetString(MsgFromServer, 0, MsgFromServer.Length);
-                        Board plansza = JsonConvert.DeserializeObject<Board>(asciiString);
-                     
+                                byte[] MsgFromServer = new byte[1024];
+                                int size = ClientSocket.Receive(MsgFromServer);
+
+                                Console.WriteLine("Server answer: " + System.Text.Encoding.ASCII.GetString(MsgFromServer, 0, size));
+                                string asciiString = Encoding.ASCII.GetString(MsgFromServer, 0, MsgFromServer.Length);
+                                //Board plansza = JsonConvert.DeserializeObject<Board>(asciiString);
+
+                                byte[] MsgFromServer_moves = new byte[1024];
+                                int size_moves = ClientSocket.Receive(MsgFromServer_moves);
+                                Console.WriteLine("Last five moves: " + System.Text.Encoding.ASCII.GetString(MsgFromServer, 0, size));
+                                string asciiString_moves = Encoding.ASCII.GetString(MsgFromServer_moves, 0, MsgFromServer_moves.Length);
+                                //Board plansza = JsonConvert.DeserializeObject<Board>(asciiString);
+                            }
+
                     }
                     catch
                     {
@@ -119,6 +131,7 @@ namespace client
                     }
 
                 }
+                ClientSocket.Close();
             }
             catch
             {
