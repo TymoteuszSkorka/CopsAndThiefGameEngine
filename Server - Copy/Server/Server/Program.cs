@@ -20,7 +20,7 @@ namespace Server
         static bool Thief = false;
         static int start = 0;
         static bool disconnect_event = false;
-        
+        static int iteration_num = 0;
 
         static int licznik = 0;
 
@@ -229,7 +229,7 @@ namespace Server
                     int size2 = msg1.Length;
 
                     client.Send(msg1, 0, size2, SocketFlags.None);
-
+                    Program.iteration_num++;
 
                     string json_moves = JsonConvert.SerializeObject(boardPos);
                     byte[] msg1_moves = Encoding.ASCII.GetBytes(json_moves);
@@ -237,7 +237,11 @@ namespace Server
 
                     client.Send(msg1_moves, 0, size2_moves, SocketFlags.None);
 
+                    while ((Program.iteration_num % 2) != 0)
+                    {
 
+                    }
+                    Program.iteration_num = 0;
                     licznik++;
 
                 }
@@ -257,7 +261,9 @@ namespace Server
                     }
                     else if(sockEx.ErrorCode == 10060)
                     {
-                        Console.WriteLine("default settings, licznik : "+Program.licznik);
+                        Program.iteration_num++;
+                        int iteracja = Program.iteration_num / 2;
+                        Console.WriteLine("default settings--->iteration: "+iteracja);
                         error_flag = true;
                         goto while_func;
 

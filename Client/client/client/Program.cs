@@ -93,7 +93,7 @@ namespace client
                         for (int i = 1;i< 1000000;i++) {
                             if (i % 2 == 1)
                             {
-                                System.Threading.Thread.Sleep(1500);
+                                System.Threading.Thread.Sleep(2000);
                             }
                             else
                             {
