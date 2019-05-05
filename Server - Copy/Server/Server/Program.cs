@@ -53,7 +53,7 @@ namespace Server
                     Program.counter++;
                     Console.WriteLine(counter + " Clients connected");
                     //towrzymy wątek z graczem
-                    Thread UserThread = new Thread(new ThreadStart(() => p.User(ClientSocket, plansza,settings,initBoard)));
+                    Thread UserThread = new Thread(new ThreadStart(() => p.User(ClientSocket, plansza,settings,initBoard,boardPos)));
                     UserThread.Start();                   
 
                 }
@@ -182,7 +182,7 @@ namespace Server
             }
         }
 
-        public void User(Socket client, Board plansza, Settings settings, InitialMap initBoard)
+        public void User(Socket client, Board plansza, Settings settings, InitialMap initBoard, Positions boardPos)
         {
             handshake(client, plansza, settings);
             waiting_for_player(client, plansza, initBoard);
@@ -194,6 +194,7 @@ namespace Server
                 {
                     if (error_flag == true)
                     {
+                        //jeżeli nie zmieścił się w ruchach 
                         Program.error_flag = false;
                         byte[] err_msg_recive = new byte[1024];
                         int err_size_recive = client.Receive(err_msg_recive);
@@ -219,6 +220,15 @@ namespace Server
                     int size2 = msg1.Length;
 
                     client.Send(msg1, 0, size2, SocketFlags.None);
+
+
+                    string json_moves = JsonConvert.SerializeObject(boardPos);
+                    byte[] msg1_moves = Encoding.ASCII.GetBytes(json_moves);
+                    int size2_moves = msg1.Length;
+
+                    client.Send(msg1_moves, 0, size2_moves, SocketFlags.None);
+
+
                     licznik++;
 
                 }

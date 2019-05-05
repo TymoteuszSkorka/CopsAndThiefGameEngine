@@ -102,8 +102,14 @@ namespace client
 
                         Console.WriteLine("Server answer: " + System.Text.Encoding.ASCII.GetString(MsgFromServer, 0, size));
                         string asciiString = Encoding.ASCII.GetString(MsgFromServer, 0, MsgFromServer.Length);
-                        Board plansza = JsonConvert.DeserializeObject<Board>(asciiString);
-                     
+                        //Board plansza = JsonConvert.DeserializeObject<Board>(asciiString);
+
+                        byte[] MsgFromServer_moves = new byte[1024];
+                        int size_moves = ClientSocket.Receive(MsgFromServer_moves);
+                        Console.WriteLine("Last five moves: " + System.Text.Encoding.ASCII.GetString(MsgFromServer, 0, size));
+                        string asciiString_moves = Encoding.ASCII.GetString(MsgFromServer_moves, 0, MsgFromServer_moves.Length);
+                        //Board plansza = JsonConvert.DeserializeObject<Board>(asciiString);
+
                     }
                     catch
                     {
