@@ -204,8 +204,17 @@ namespace Server
                         int err_size = err_msg.Length;
 
                         client.Send(err_msg, 0, err_size, SocketFlags.None);
-                        goto while_func;
+
+
+                        string json_moves_err = JsonConvert.SerializeObject(boardPos);
+                        byte[] msg1_moves_err = Encoding.ASCII.GetBytes(json_moves_err);
+                        int size2_moves_err = msg1_moves_err.Length;
+
+                        client.Send(msg1_moves_err, 0, size2_moves_err, SocketFlags.None);
+
+                        //goto while_func;
                     }
+                    //client.ReceiveTimeout = 3000;
                     Program.error_flag = false;
 
                     byte[] msg = new byte[1024];
@@ -224,7 +233,7 @@ namespace Server
 
                     string json_moves = JsonConvert.SerializeObject(boardPos);
                     byte[] msg1_moves = Encoding.ASCII.GetBytes(json_moves);
-                    int size2_moves = msg1.Length;
+                    int size2_moves = msg1_moves.Length;
 
                     client.Send(msg1_moves, 0, size2_moves, SocketFlags.None);
 
