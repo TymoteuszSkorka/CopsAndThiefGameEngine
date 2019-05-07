@@ -136,9 +136,9 @@ namespace client
                         //byte[] MsgFromServer = new byte[1024];
                         //int size = ClientSocket.Receive(MsgFromServer);
 
-                        byte[] MsgFromServer_moves = new byte[1024];
-                        int size_moves = ClientSocket.Receive(MsgFromServer_moves);
-                        lastKMoves = JsonConvert.DeserializeObject<Positions>(System.Text.Encoding.ASCII.GetString(MsgFromServer_moves, 0, size_moves));
+                       // byte[] MsgFromServer_moves = new byte[1024];
+                       // int size_moves = ClientSocket.Receive(MsgFromServer_moves);
+                        //lastKMoves = JsonConvert.DeserializeObject<Positions>(System.Text.Encoding.ASCII.GetString(MsgFromServer_moves, 0, size_moves));
 
                     }
                     catch

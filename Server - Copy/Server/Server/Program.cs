@@ -54,7 +54,7 @@ namespace Server
                     Program.counter++;
                     Console.WriteLine(counter + " Clients connected");
                     //towrzymy wątek z graczem
-                    Thread UserThread = new Thread(new ThreadStart(() => p.User(ClientSocket, ref plansza,ref settings,initBoard,boardPos, ref playersMoves)));
+                    Thread UserThread = new Thread(new ThreadStart(() => p.User(ClientSocket, ref plansza,ref settings,initBoard,ref boardPos, ref playersMoves)));
                     UserThread.Start();                   
                 }
             while (plansza.m_bIfGameOver == false)
@@ -202,7 +202,7 @@ namespace Server
             }
         }
 
-        public void User(Socket client, ref Board plansza, ref Settings settings, InitialMap initBoard, Positions boardPos, ref Moves[] playersMove)
+        public void User(Socket client, ref Board plansza, ref Settings settings, InitialMap initBoard, ref Positions boardPos, ref Moves[] playersMove)
         {
             handshake(client, plansza, settings);
             if (client.Connected)
