@@ -135,12 +135,11 @@ namespace client
                         ClientSocket.Send(System.Text.Encoding.ASCII.GetBytes(messageFromClient),
                             0, messageFromClient.Length, SocketFlags.None);
                         myMoves.resetMoves();
-                        //byte[] MsgFromServer = new byte[1024];
-                        //int size = ClientSocket.Receive(MsgFromServer);
+
 
                         byte[] MsgFromServer_moves = new byte[2000];
                         int size_moves = ClientSocket.Receive(MsgFromServer_moves);
-                        Console.WriteLine(System.Text.Encoding.ASCII.GetString(MsgFromServer_moves, 0, size_moves));
+                        //Console.WriteLine(System.Text.Encoding.ASCII.GetString(MsgFromServer_moves, 0, size_moves));
                         lastKMoves = JsonConvert.DeserializeObject<Positions>(System.Text.Encoding.ASCII.GetString(MsgFromServer_moves, 0, size_moves));
                     }
                     catch

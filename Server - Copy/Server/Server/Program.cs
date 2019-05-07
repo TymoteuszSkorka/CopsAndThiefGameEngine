@@ -71,7 +71,7 @@ namespace Server
             Console.Read();
             }
 
-        public void handshake(Socket client, Board plansza, Settings settings)
+        public string handshake(Socket client, Board plansza, Settings settings)
         {
             string handShakeMsg = "Welcome to Cops&Thiefs game. Type 'T' for Thief or 'P' for Policeman: ";
             client.Send(System.Text.Encoding.ASCII.GetBytes(handShakeMsg),
@@ -117,11 +117,13 @@ namespace Server
                 //
                 //
                 //
-                //wysyłamy pierwszy wylosowany stan planszy
+                //wysyłamy ustawienia
                 string json = JsonConvert.SerializeObject(settings);
                 byte[] msg1 = Encoding.ASCII.GetBytes(json);
                 int size2 = msg1.Length;
                 client.Send(msg1, 0, size2, SocketFlags.None);
+                return role;
+
             }
             catch (System.Net.Sockets.SocketException sockEx)
             {
@@ -137,9 +139,10 @@ namespace Server
                 Console.WriteLine("Clients connected:" + counter);
                 Program.Police = false;
                 Program.Thief = false;
-                Program.start = 0;               
+                Program.start = 0;
+                return null;
             }
-
+            
         }
         public void waiting_for_player(Socket client, Board plansza, InitialMap initBoard)
         {
@@ -204,7 +207,7 @@ namespace Server
 
         public void User(Socket client, ref Board plansza, ref Settings settings, InitialMap initBoard, ref Positions boardPos, ref Moves[] playersMove)
         {
-            handshake(client, plansza, settings);
+            string role=handshake(client, plansza, settings);
             if (client.Connected)
             {
                 waiting_for_player(client, plansza, initBoard);
@@ -223,12 +226,14 @@ namespace Server
                         byte[] err_msg_recive = new byte[1024];
                         int err_size_recive = client.Receive(err_msg_recive);
 
-                        string err_json = JsonConvert.SerializeObject(settings);
-                        byte[] err_msg = Encoding.ASCII.GetBytes(err_json);
-                        int err_size = err_msg.Length;
+                        if (role == "Thief")
+                        {
 
-                        client.Send(err_msg, 0, err_size, SocketFlags.None);
-
+                        }
+                        else if(role == "Policeman")
+                        {
+                            
+                        }
 
                         string json_moves_err = JsonConvert.SerializeObject(boardPos);
                         byte[] msg1_moves_err = Encoding.ASCII.GetBytes(json_moves_err);
