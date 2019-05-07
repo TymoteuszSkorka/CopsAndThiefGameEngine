@@ -179,7 +179,7 @@ namespace main
         {
             for (int a = 0; a < kClock; ++a)
             { 
-                if (m_32CurrentIteration < m_32MaxNumberOfIterations)
+                if (m_32CurrentIteration < m_32MaxNumberOfIterations && m_bIfGameOver == false)
                 {
                     if (m_bIfGameOver == false)
                     {
@@ -246,7 +246,7 @@ namespace main
                     System.Threading.Thread.Sleep(200);
                     ++m_32CurrentIteration;
                 }
-                else
+                else if (m_32CurrentIteration >= m_32MaxNumberOfIterations && m_bIfGameOver == true)
                 {
                     m_32ThiefPayment = m_32MaxNumberOfIterations;
                     m_32CopsPayment = -m_32ThiefPayment;

@@ -19,6 +19,7 @@ namespace Server
         static bool Police = false;
         static bool Thief = false;
         static int start = 0;
+        static bool isAboutToMove = false;
         static bool disconnect_event = false;
         static int iteration_num = 0;
 
@@ -26,7 +27,6 @@ namespace Server
 
         static void Main(string[] args)
         {
-            int x = 0;
             InitialMap initBoard = new InitialMap();
             Positions boardPos = new Positions();
             Settings settings = new Settings();
@@ -54,10 +54,21 @@ namespace Server
                     Program.counter++;
                     Console.WriteLine(counter + " Clients connected");
                     //towrzymy wątek z graczem
-                    Thread UserThread = new Thread(new ThreadStart(() => p.User(ClientSocket, ref plansza,ref settings,initBoard,boardPos, ref playersMoves, ref x)));
+                    Thread UserThread = new Thread(new ThreadStart(() => p.User(ClientSocket, ref plansza,ref settings,initBoard,boardPos, ref playersMoves)));
                     UserThread.Start();                   
                 }
-     
+            while (plansza.m_bIfGameOver == false)
+            {
+                if (isAboutToMove)
+                {
+                    plansza.simulate(playersMoves[1].m_16Moves, playersMoves[0].m_16Moves);
+                    isAboutToMove = false;
+                }
+            }
+            Console.WriteLine("Zwyciezca: " + plansza.winner);
+            Console.WriteLine("Punkty Złodzieja: " + plansza.m_32ThiefPayment);
+            Console.WriteLine("Punkty Policjantów: " + plansza.m_32CopsPayment);
+            Console.Read();
             }
 
         public void handshake(Socket client, Board plansza, Settings settings)
@@ -191,7 +202,7 @@ namespace Server
             }
         }
 
-        public void User(Socket client, ref Board plansza, ref Settings settings, InitialMap initBoard, Positions boardPos, ref Moves[] playersMove, ref int x)
+        public void User(Socket client, ref Board plansza, ref Settings settings, InitialMap initBoard, Positions boardPos, ref Moves[] playersMove)
         {
             handshake(client, plansza, settings);
             if (client.Connected)
@@ -260,15 +271,12 @@ namespace Server
 
                     }
                     Program.iteration_num = 0;
-                    licznik++;
-                    x++;
-                    if (x == 1)
-                        plansza.simulate(playersMove[1].m_16Moves, playersMove[0].m_16Moves);
-                    else
+                    isAboutToMove = true;
+                    while(isAboutToMove)
                     {
-                        x = 0;
-                    }
 
+                    }
+                    licznik++;
                 }
                 
                 catch(System.Net.Sockets.SocketException sockEx)
