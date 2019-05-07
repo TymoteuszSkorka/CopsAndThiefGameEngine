@@ -51,7 +51,7 @@ elif messageFromClient_HS == "P":
     myMoves = Moves(messageFromClient_HS, settings["kClock"], settings["numOfCops"])
 
 #wysylamy wiadomosc ze chcemy juz zaczac
-messageFromClient_GO = input(">")
+messageFromClient_GO = input("Type whateve if u'r ready: ")
 ClientSocket.sendto(messageFromClient_GO.encode(), server_address)
 #czekanie na potwierdzenie serwera ze gra sie zaczela
 rolled_board_json = ClientSocket.recv(1024)

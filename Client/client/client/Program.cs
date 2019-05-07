@@ -88,7 +88,7 @@ namespace client
                     }
 
                     //wysyłamy wiadomosc ze chcemy zaczac
-                    Console.Write("Type whateve if u'r ready");
+                    Console.Write("Type whateve if u'r ready: ");
                     string GO_messageFromClient_HS = Console.ReadLine();
                     ClientSocket.Send(System.Text.Encoding.ASCII.GetBytes(GO_messageFromClient_HS),
                            0, GO_messageFromClient_HS.Length, SocketFlags.None);
