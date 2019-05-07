@@ -213,28 +213,18 @@ namespace Server
                 waiting_for_player(client, plansza, initBoard);
             }
 
-        while_func:
             while (client.Connected)        
             {
                 bool error_flag = false;
+            while_func:
                 try
                 {
                     if (error_flag == true)
                     {
-                        //jeżeli nie zmieścił się w ruchach 
+                        //jeżeli nie zmieścił się w ruchach
                         error_flag = false;
                         byte[] err_msg_recive = new byte[1024];
                         int err_size_recive = client.Receive(err_msg_recive);
-
-                        if (role == "Thief")
-                        {
-
-                        }
-                        else if(role == "Policeman")
-                        {
-                            
-                        }
-
                         string json_moves_err = JsonConvert.SerializeObject(boardPos);
                         byte[] msg1_moves_err = Encoding.ASCII.GetBytes(json_moves_err);
                         int size2_moves_err = msg1_moves_err.Length;
@@ -243,6 +233,7 @@ namespace Server
 
                         //goto while_func;
                     }
+
 
                     byte[] msg = new byte[1024];
 
@@ -306,12 +297,33 @@ namespace Server
                     
                     else if(sockEx.ErrorCode == 10060)
                     {
+                        if (role == "Thief")
+                        {
+                            Moves tmpMove = new Moves();
+                            tmpMove.init(settings.kClock, 1, "T");
+                            playersMove[0] = tmpMove;
+                        }
+                        else if (role == "Policeman")
+                        {
+                            Moves tmpMove = new Moves();
+                            tmpMove.init(settings.kClock, settings.numOfCops, "C");
+                            playersMove[1] = tmpMove;
+                        }
                         Program.iteration_num++;
-                        int iteracja = Program.iteration_num / 2;
-                        Console.WriteLine("default settings--->iteration: "+iteracja);
+                        while ((Program.iteration_num % 2) != 0)
+                        {
+
+                        }
+                        Program.iteration_num = 0;
+                        isAboutToMove = true;
+                        while (isAboutToMove)
+                        {
+
+                        }
+                        //int iteracja = Program.iteration_num / 2;
+                        //Console.WriteLine("default settings--->iteration: " + iteracja);
                         error_flag = true;
                         goto while_func;
-
                     }
 
                 }

@@ -108,6 +108,7 @@ namespace client
                 {
                     try
                     {
+                        System.Threading.Thread.Sleep(4000);
                         //w tym miejsu dodać wysyłanie JSONEM do serwera obliczonych zmian na planszy
                         //
                         //
