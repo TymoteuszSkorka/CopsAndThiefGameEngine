@@ -70,6 +70,7 @@ namespace client
                     byte[] board_state = new byte[1024];
                     int board_state_Size = ClientSocket.Receive(board_state);
                     string json = System.Text.Encoding.ASCII.GetString(board_state, 0, board_state_Size);
+                    Console.WriteLine(json);
                     boardSettings = JsonConvert.DeserializeObject<Settings>(json);
 
                     /*
@@ -97,6 +98,7 @@ namespace client
                     int start_flag_size = ClientSocket.Receive(rolled_board);
                     json = System.Text.Encoding.ASCII.GetString(rolled_board, 0, start_flag_size);
                     initBoard = JsonConvert.DeserializeObject<InitialMap>(json);
+                    Console.WriteLine(json);
 
                 }
 //end of handshake --------------------------------------------------------------------------------------------------------------------------
@@ -136,10 +138,10 @@ namespace client
                         //byte[] MsgFromServer = new byte[1024];
                         //int size = ClientSocket.Receive(MsgFromServer);
 
-                       // byte[] MsgFromServer_moves = new byte[1024];
-                       // int size_moves = ClientSocket.Receive(MsgFromServer_moves);
-                        //lastKMoves = JsonConvert.DeserializeObject<Positions>(System.Text.Encoding.ASCII.GetString(MsgFromServer_moves, 0, size_moves));
-
+                        byte[] MsgFromServer_moves = new byte[2000];
+                        int size_moves = ClientSocket.Receive(MsgFromServer_moves);
+                        Console.WriteLine(System.Text.Encoding.ASCII.GetString(MsgFromServer_moves, 0, size_moves));
+                        lastKMoves = JsonConvert.DeserializeObject<Positions>(System.Text.Encoding.ASCII.GetString(MsgFromServer_moves, 0, size_moves));
                     }
                     catch
                     {

@@ -256,14 +256,9 @@ namespace Server
                     }
                     catch
                     {
-
+                        Console.WriteLine("ERROR");
                     }
                     
-                    string json = JsonConvert.SerializeObject(boardPos);
-                    byte[] msg1 = Encoding.ASCII.GetBytes(json);
-                    int size2 = msg1.Length;
-
-                    client.Send(msg1, 0, size2, SocketFlags.None);
                     Program.iteration_num++;
 
                     while ((Program.iteration_num % 2) != 0)
@@ -276,6 +271,11 @@ namespace Server
                     {
 
                     }
+                    string json = JsonConvert.SerializeObject(boardPos);
+                    byte[] msg1 = Encoding.ASCII.GetBytes(json);
+                    int size2 = msg1.Length;
+
+                    client.Send(msg1, 0, size2, SocketFlags.None);
                     licznik++;
                 }
                 
