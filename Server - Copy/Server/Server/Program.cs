@@ -185,7 +185,7 @@ namespace Server
 
                 client.Send(msg1, 0, size2, SocketFlags.None);
 
-                client.ReceiveTimeout = 3000;
+                client.ReceiveTimeout = 500;
             }
             catch
             {

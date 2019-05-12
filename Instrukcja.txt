@@ -1,0 +1,70 @@
+Odpalamy server - copy, nastepnie clientow. W cliencie trzeba
+wybrac czy chcemy byc policjantem (P) czy zlodziejem
+(T). Otrzymujemy ustawienia swiata i mamy nieograniczony
+czas na jakies obliczenia i wpisujemy cokolwiek i wysylamy
+ze jestemy gotowi.
+Klasa Settings zawiera:
+
+public short xDim; - wymiar x planszy
+public short yDim; - wymiar y planszy
+public short numOfCops; - ilosc policjantow
+public short numOfWalls; - ilosc scian
+public short numOfGates; - ilosc furtek
+public short sizeOfWalls; - rozmiar scian
+public short sizeOfGates; - rozmiar furtek
+public int maxNumOfIterations; - maksymalna ilosc ruchow
+public short kClock; - ilosc ruchow jakie musicie podac na raz
+public float probOfWallMove; - prawdopodobienstwo ruchu sciany
+public float probOfWallChangeDir; - prawdopodobienstwo zmiany kierunku sciany
+public float probOfGateMove; - prawdopodobienstwo ruchu furtki
+public float probOfGateChangeDir; - prawdopodobienstwo zmiany kierunku furtki
+
+prawdopodobienstwa sa wyrazane jako float w zakresie<0; 1>
+
+nastepnie gdy zgloscicie gotowosc otzrymujecie stan
+poczatkowy planszy i w tym momencie macie 500ms na
+podanie ruchow.
+
+Poczatkowa plansza:
+public short[] ThiefPos; - [nr wiersza zlodzieja to 0, a  numer kolumny to 1] 
+public short[,] CopsPos; - [i-ty policjant][wiersz/kolumna]
+public short[,,] WallsPos; - [i-ta sciana][j-ty fragment sciany][w/k]
+public short[,,] GatesPos; - [i-ta furtka][j-ty fragment furtki][w/k]
+
+Swoje ruchy wpisujecie do klasy Moves:
+
+public string m_sRole; - P lub T
+public short[,] m_16Moves; - [k-ty ruch][i-ta jednostka np. pierwszy policjant to 0]
+
+ruchy:
+0 - pusty ruch
+1 - ruch w gore
+2 - ruch w prawo
+3 - ruch w dol
+4 - ruch w lewo
+
+Nastepnie do zakonczenia rozgrywki na zmiane otrzymujecie
+plansze z ostatnimi k-ruchami plansz, gdzie ostatni ruch
+to ten wykonany przed wyslaniem do was planszy.
+
+Plansza z k-ruchami:
+
+public short[,] ThiefPos; - [k-ty ruch][nr wiersza zlodzieja to 0, a  numer kolumny to 1] 
+public short[,,] CopsPos; - [k-ty ruch][i-ty policjant][wiersz/kolumna]
+public short[,,,] WallsPos; - [k-ty ruch][i-ta sciana][j-ty fragment sciany][w/k]
+public short[,,,] GatesPos; - [k-ty ruch][i-ta furtka][j-ty fragment furtki][w/k]
+
+Tutaj z kolejnoscia ruchów jest tak samo.
+
+Dla ludzi piszacych w C#:
+Wszystkie jsony macie juz zrzutowane na klasy, wiec
+ruchy uzupelniacie wypelniajac pola obiektu myMoves,
+a jak chcecie np. zobaczyc ustawienia swiata to tak samo
+sprawdzacie sobie po prostu poszczegolne elementy obiektu
+klasy Settings
+
+Dla ludzi piszacych w python:
+Jsony macie zrzutowane i uzupelniacie ruchy wypelniajac
+pola obiektu myMoves. A jak chcecie sobie podejrzec np.
+ustawienia to odwolujecie sie w nastepujacy sposób:
+nazwa_zmiennej["pole_ktore_chcecie_zobaczyc"].

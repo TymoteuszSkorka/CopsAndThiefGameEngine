@@ -17,7 +17,7 @@ namespace main
         public int m_32CopsPayment;
         private short kClock;
         private int m_32MaxNumberOfIterations;
-        private int m_32CurrentIteration;
+        public int m_32CurrentIteration;
         private short m_16SizeOfWall;
         private short m_16SizeOfGate;
         private List<Cop> m_listOfCops;
@@ -51,7 +51,7 @@ namespace main
             m_32CopsPayment = 0;
             m_32CurrentIteration = 0;
             m_bIfGameOver = false;
-            generator = new Random();
+            generator = new Random(1);
             m_cBoardMap = new char[m_16NumOfRows, m_16NumOfColumns];
             firstBoard.Init(a_16NumOfCops, a_16NumOfWalls, a_16NumOfGates, a_16SizeOfWalls, a_16SizeOfGates);
             boardPositions.Init(kClock, a_16NumOfCops, a_16NumOfWalls, a_16NumOfGates, a_16SizeOfWalls, a_16SizeOfGates);
@@ -247,6 +247,13 @@ namespace main
                     ++m_32CurrentIteration;
                 }
                 else if (m_32CurrentIteration >= m_32MaxNumberOfIterations && m_bIfGameOver == true)
+                {
+                    m_32ThiefPayment = m_32MaxNumberOfIterations;
+                    m_32CopsPayment = -m_32ThiefPayment;
+                    m_bIfGameOver = true;
+                    winner = "Thief";
+                }
+                else if (m_32CurrentIteration >= m_32MaxNumberOfIterations && m_bIfGameOver == false)
                 {
                     m_32ThiefPayment = m_32MaxNumberOfIterations;
                     m_32CopsPayment = -m_32ThiefPayment;

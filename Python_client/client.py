@@ -44,22 +44,27 @@ print(MsgFromServer_state)
 settings_json = ClientSocket.recv(1024)
 print(settings_json)
 settings = json.loads(settings_json)
+print()
 
 if messageFromClient_HS == "T":
     myMoves = Moves(messageFromClient_HS, settings["kClock"], 1)
 elif messageFromClient_HS == "P":
     myMoves = Moves(messageFromClient_HS, settings["kClock"], settings["numOfCops"])
 
+#Tutaj macie nieograniczony czas na jakies obliczenia
+
 #wysylamy wiadomosc ze chcemy juz zaczac
 messageFromClient_GO = input("Type whateve if u'r ready: ")
 ClientSocket.sendto(messageFromClient_GO.encode(), server_address)
 #czekanie na potwierdzenie serwera ze gra sie zaczela
+#Tutaj dostajecie poczatkowa plansze
 rolled_board_json = ClientSocket.recv(1024)
 print(rolled_board_json)
+print()
 rolled_board = json.loads(rolled_board_json)
 
 while True:
-    #tutaj wstawic do jsona tablice z naszymi ruchami ktora wyslemy do servera
+    #Tutaj macie 500ms na uzupelnienie ruchow. Wyrzuccie sobie ten random
     for i in range(len(myMoves.m_16Moves)):
         for j in range(len(myMoves.m_16Moves[i])):
             myMoves.m_16Moves[i, j] = random.randint(0, 5)
@@ -71,6 +76,10 @@ while True:
     ClientSocket.sendto(messageFromClient.encode(), server_address)
     # MsgFromServer = ClientSocket.recv(2000)
     # print("Server answer: " + str(MsgFromServer))
-    MsgFromServer_moves = ClientSocket.recv(2000)
+    MsgFromServer_moves = ClientSocket.recv(3000)
     print(str(MsgFromServer_moves))
+    kMoves = json.loads(MsgFromServer_moves)
+	#Przyklad odwolania sie do jsonowego obiektu
+    #print(kMoves["ThiefPos"][0])
+    print()
 

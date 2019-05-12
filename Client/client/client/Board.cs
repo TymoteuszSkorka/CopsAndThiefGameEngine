@@ -67,7 +67,7 @@ namespace main
             }
             m_Thief = new Thief(this, ref m_cBoardMap);
             firstBoard.ThiefPos[0] = m_Thief.m_16ThiefPosition[0];
-            firstBoard.ThiefPos[0] = m_Thief.m_16ThiefPosition[1];
+            firstBoard.ThiefPos[1] = m_Thief.m_16ThiefPosition[1];
             for (int i = 0; i < a_16NumOfCops; ++i)
             {
                 m_listOfCops.Add(new Cop(this, ref m_cBoardMap));
